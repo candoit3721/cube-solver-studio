@@ -1,0 +1,122 @@
+/* ── SidePanel ── */
+.panel-toggle {
+    position: fixed;
+    top: 48px;
+    right: 12px;
+    z-index: 11;
+    border-radius: 8px;
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.panel-toggle.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.side-panel {
+    position: fixed;
+    top: 0;
+    right: -340px;
+    width: 320px;
+    height: 100vh;
+    z-index: 9;
+    background: rgba(15, 15, 24, 0.92);
+    border-left: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    padding: 70px 16px 16px;
+    overflow-y: auto;
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.side-panel.open {
+    right: 0;
+}
+
+.sp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.sp-header h3 {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.method-select {
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.sp-overview {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+.sp-overview strong {
+    color: var(--text);
+}
+
+.sp-phase-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 8px 0 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 6px;
+}
+
+.sp-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sp-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--surface-hover);
+}
+
+.sp-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.sp-card.done {
+    opacity: 0.5;
+    border-color: var(--green);
+}
+
+.sp-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.sp-moves {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    word-break: break-all;
+    margin-bottom: 4px;
+}
+
+.sp-phase {
+    font-size: 10px;
+    color: var(--text-muted);
+}

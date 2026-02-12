@@ -1,0 +1,86 @@
+/* ── EditorModal ── */
+.cube-net {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 12px;
+}
+
+.net-row {
+    display: flex;
+    gap: 2px;
+}
+
+.net-spacer {
+    width: 102px;
+    height: 102px;
+}
+
+.face-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.face-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.face-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 30px);
+    grid-template-rows: repeat(3, 30px);
+    gap: 2px;
+    background: #222;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.cell {
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.cell:hover {
+    transform: scale(1.15);
+    filter: brightness(1.2);
+    z-index: 1;
+}
+
+.palette {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 12px 0;
+}
+
+.pb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.pb:hover {
+    transform: scale(1.15);
+}
+
+.pb.active {
+    border-color: #fff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+    transform: scale(1.2);
+}
+
+.editor-err {
+    color: var(--red);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 8px;
+}
