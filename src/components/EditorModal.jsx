@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { FACES, FACE_HEX } from '../engine/constants.js';
 import { useCubeState } from '../hooks/useCubeState.jsx';
+import { faceMapToFaceletString } from '../engine/solver.js';
 import '../styles/EditorModal.css';
 
 const NET_LAYOUT = [
@@ -20,9 +21,16 @@ export default function EditorModal({ open, onClose }) {
         return s;
     });
     const [brush, setBrush] = useState('U');
-    const [error, setError] = useState('');
+
+    // Calculate counts
+    const counts = FACES.reduce((acc, f) => { acc[f] = 0; return acc; }, {});
+    FACES.forEach(f => {
+        editorState[f].forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+    });
+    const isValid = FACES.every(f => counts[f] === 9);
 
     const handleCellClick = (face, idx) => {
+        if (idx === 4) return; // Lock center
         setEditorState(prev => {
             const next = { ...prev };
             next[face] = [...prev[face]];
@@ -35,23 +43,45 @@ export default function EditorModal({ open, onClose }) {
         const s = {};
         FACES.forEach(f => { s[f] = Array(9).fill(f); });
         setEditorState(s);
-        setError('');
     };
 
     const handleApply = () => {
-        // Validate: each color must appear exactly 9 times
-        const counts = {};
-        FACES.forEach(f => {
-            editorState[f].forEach(c => { counts[c] = (counts[c] || 0) + 1; });
-        });
-        const bad = Object.entries(counts).filter(([, v]) => v !== 9);
-        if (bad.length) {
-            setError(`Need exactly 9 of each color. ${bad.map(([k, v]) => k + ':' + v).join(', ')}`);
-            return;
-        }
-        setError('');
+        if (!isValid) return;
         applyColorState(editorState);
         onClose();
+    };
+
+    const getValidationMsg = () => {
+        const missing = [];
+        const extra = [];
+        FACES.forEach(f => {
+            const count = counts[f] || 0;
+            if (count > 9) extra.push(`${f} (+${count - 9})`);
+            if (count < 9) missing.push(`${f} (-${9 - count})`);
+        });
+        if (extra.length > 0 || missing.length > 0) {
+            const parts = [];
+            if (extra.length) parts.push(`Remove: ${extra.join(', ')}`);
+            if (missing.length) parts.push(`Add: ${missing.join(', ')}`);
+            return parts.join('. ');
+        }
+
+        // 2. Parity/Orientation Check (Advanced)
+        if (typeof window.Cube !== 'undefined') {
+            try {
+                // Determine if valid
+                const s = faceMapToFaceletString(editorState);
+                window.Cube.fromString(s); // Throws if invalid
+                return null;
+            } catch (e) {
+                let msg = e.message || "Invalid configuration";
+                // Strip "Error:" prefix
+                msg = msg.replace(/^Error:\s*/i, '');
+                return "Impossible: " + msg;
+            }
+        }
+
+        return null;
     };
 
     if (!open) return null;
@@ -74,10 +104,12 @@ export default function EditorModal({ open, onClose }) {
                                             {editorState[face].map((color, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="cell"
+                                                    className={`cell ${idx === 4 ? 'center-cell' : ''}`}
                                                     style={{ background: FACE_HEX[color] }}
                                                     onClick={() => handleCellClick(face, idx)}
-                                                />
+                                                >
+                                                    {idx === 4 && <span className="lock-icon">🔒</span>}
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
@@ -88,23 +120,32 @@ export default function EditorModal({ open, onClose }) {
                 </div>
 
                 <div className="palette">
-                    {FACES.map(f => (
-                        <div
-                            key={f}
-                            className={`pb ${f === brush ? 'active' : ''}`}
-                            style={{ background: FACE_HEX[f] }}
-                            title={f}
-                            onClick={() => setBrush(f)}
-                        />
-                    ))}
+                    {FACES.map(f => {
+                        const count = counts[f] || 0;
+                        const isOver = count > 9;
+                        return (
+                            <div
+                                key={f}
+                                className={`pb ${f === brush ? 'active' : ''} ${isOver ? 'over' : ''}`}
+                                style={{
+                                    background: FACE_HEX[f],
+                                    borderColor: f === brush ? '#fff' : (isOver ? 'var(--red)' : 'transparent')
+                                }}
+                                title={`${f}: ${count}/9`}
+                                onClick={() => setBrush(f)}
+                            >
+                                <span className="pb-count">{count}</span>
+                            </div>
+                        );
+                    })}
                 </div>
 
-                {error && <div className="editor-err">{error}</div>}
+                {!isValid && <div className="editor-err">{getValidationMsg()}</div>}
 
                 <div className="modal-actions">
-                    <button className="btn" onClick={handleClear}>Clear</button>
+                    <button className="btn" onClick={handleClear}>Reset</button>
                     <button className="btn" onClick={onClose}>Cancel</button>
-                    <button className="btn btn-primary" onClick={handleApply}>Apply to Cube</button>
+                    <button className="btn btn-primary" disabled={!isValid} onClick={handleApply}>Apply</button>
                 </div>
             </div>
         </div>

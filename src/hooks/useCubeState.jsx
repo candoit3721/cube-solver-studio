@@ -5,6 +5,8 @@ import { createContext, useContext, useReducer, useRef, useCallback } from 'reac
 import { FACES, INVERT } from '../engine/constants.js';
 import { doMoveAnimated, doMoveInstant, isBusy } from '../engine/animator.js';
 import { solveFaceMap } from '../engine/solver.js';
+import { solveLayered } from '../engine/layeredSolver.js';
+import { createSolvedState, applyMoves as applyMovesState, faceMapToState } from '../engine/cubeState.js';
 
 const CubeCtx = createContext(null);
 
@@ -17,6 +19,10 @@ const initialState = {
     sidePanel: '',       // overview text
     sidePanelErr: '',    // error text
     sidePanelSolved: false,
+    customPattern: null, // Store custom pattern to solve later
+    solverMethod: 'optimal', // 'optimal' | 'beginner'
+    phases: null,        // beginner solver phase data
+    scrambleMoves: null, // raw scramble moves for beginner solver
 };
 
 function reducer(state, action) {
@@ -24,7 +30,7 @@ function reducer(state, action) {
         case 'SET':
             return { ...state, ...action.payload };
         case 'RESET':
-            return { ...initialState };
+            return { ...initialState, solverMethod: state.solverMethod };
         default:
             return state;
     }
@@ -34,6 +40,8 @@ export function CubeProvider({ children }) {
     const [state, dispatch] = useReducer(reducer, initialState);
     const engineRef = useRef(null);
     const speedRef = useRef(5);
+    const stateRef = useRef(state);
+    stateRef.current = state;
 
     const set = useCallback((payload) => dispatch({ type: 'SET', payload }), []);
 
@@ -63,47 +71,107 @@ export function CubeProvider({ children }) {
 
         set({
             mode: 'scrambling', scramble: moves, solution: [], step: 0, playing: false,
-            sidePanel: '', sidePanelErr: '', sidePanelSolved: false
+            sidePanel: '', sidePanelErr: '', sidePanelSolved: false,
+            phases: null, scrambleMoves: moves, customPattern: null,
         });
 
         for (const mv of moves) {
             await doMoveAnimated(eng.scene, eng.cubies, mv, 70);
         }
 
-        const solution = [...moves].reverse().map(INVERT);
-        set({ mode: 'ready', solution, step: 0 });
+        // Compute solution based on current solver method
+        const method = stateRef.current.solverMethod;
+        if (method === 'beginner') {
+            const scrambledState = applyMovesState(createSolvedState(), moves);
+            const result = solveLayered(scrambledState);
+            if (result.error) {
+                set({ mode: 'ready', solution: [], step: 0, sidePanelErr: result.error, phases: null });
+            } else {
+                set({ mode: 'ready', solution: result.moves, step: 0, phases: result.phases });
+            }
+        } else {
+            const solution = [...moves].reverse().map(INVERT);
+            set({ mode: 'ready', solution, step: 0, phases: null });
+        }
     }, [genScramble, set]);
 
     /** Start or resume solving */
-    const solve = useCallback(async (currentSolution, currentStep) => {
+    const solve = useCallback(async (currentSolution, currentStep, customPattern) => {
         const eng = engineRef.current;
         if (!eng) return;
+
+        let sol = currentSolution;
+
+        // If no solution yet, try to compute it (Custom Pattern case)
+        if ((!sol || sol.length === 0) && customPattern) {
+            const method = stateRef.current.solverMethod;
+            set({ mode: 'solving', sidePanel: 'Computing solution...', sidePanelErr: '', phases: null });
+
+            // Yield to UI
+            await new Promise(r => setTimeout(r, 50));
+
+            if (method === 'beginner') {
+                const cubeState = faceMapToState(customPattern);
+                const result = solveLayered(cubeState);
+                if (result.error) {
+                    set({ mode: 'idle', sidePanel: '', sidePanelErr: result.error, phases: null });
+                    return;
+                }
+                if (result.moves.length === 0) {
+                    set({ mode: 'idle', sidePanelSolved: true, sidePanel: 'Already solved!', sidePanelErr: '', phases: null });
+                    return;
+                }
+                sol = result.moves;
+                set({ solution: sol, step: 0, mode: 'ready', sidePanel: `Solution: ${sol.length} moves`, phases: result.phases });
+            } else {
+                // Log for debug
+                console.time('solve');
+                const result = await solveFaceMap(customPattern);
+                console.timeEnd('solve');
+
+                if (result.error) {
+                    set({ mode: 'idle', sidePanel: '', sidePanelErr: result.error });
+                    return;
+                } else if (result.solved) {
+                    set({ mode: 'idle', sidePanelSolved: true, sidePanel: 'Already solved!', sidePanelErr: '' });
+                    return;
+                }
+
+                sol = result.moves;
+                set({ solution: sol, step: 0, mode: 'ready', sidePanel: `Solution: ${sol.length} moves`, phases: null });
+            }
+
+            // Wait a bit before playing
+            await new Promise(r => setTimeout(r, 500));
+        }
+
+        if (!sol || sol.length === 0) return;
 
         set({ mode: 'solving', playing: true });
 
         eng._playing = true;
 
         return new Promise((resolve) => {
-            const runStep = async (stepIdx, sol) => {
-                if (!eng._playing || stepIdx >= sol.length) {
+            const runStep = async (stepIdx, s) => {
+                if (!eng._playing || stepIdx >= s.length) {
                     eng._playing = false;
-                    const done = stepIdx >= sol.length;
+                    const done = stepIdx >= s.length;
                     set({ playing: false, mode: done ? 'idle' : 'paused' });
                     resolve();
                     return;
                 }
 
-                await doMoveAnimated(eng.scene, eng.cubies, sol[stepIdx], solveDur());
+                await doMoveAnimated(eng.scene, eng.cubies, s[stepIdx], solveDur());
                 const next = stepIdx + 1;
                 set({ step: next });
 
-                if (eng._playing && next < sol.length) {
+                if (eng._playing && next < s.length) {
                     await new Promise(r => setTimeout(r, 250));
                 }
-                runStep(next, sol);
+                runStep(next, s);
             };
 
-            runStep(currentStep, currentSolution);
+            runStep(currentStep || 0, sol);
         });
     }, [set, solveDur]);
 
@@ -168,32 +236,32 @@ export function CubeProvider({ children }) {
         dispatch({ type: 'RESET' });
     }, []);
 
-    /** Apply a custom faceMap pattern and solve it */
-    const applyColorState = useCallback((faceMap) => {
+    /** Switch solver method */
+    const setMethod = useCallback((method) => {
+        set({ solverMethod: method, phases: null });
+    }, [set]);
+
+    /** Apply a custom faceMap pattern w/o solving immediately */
+    const applyColorState = useCallback(async (faceMap) => {
         const eng = engineRef.current;
         if (!eng) return;
 
         eng.createCube(faceMap);
-        set({ playing: false, scramble: [], solution: [], step: 0 });
 
-        const result = solveFaceMap(faceMap);
-        if (result.error) {
-            set({ mode: 'idle', sidePanel: '', sidePanelErr: result.error });
-        } else if (result.solved) {
-            set({ mode: 'idle', sidePanelSolved: true, sidePanel: '', sidePanelErr: '' });
-        } else {
-            set({
-                mode: 'ready', solution: result.moves, step: 0,
-                sidePanel: '', sidePanelErr: '', sidePanelSolved: false
-            });
-        }
+        // Reset state, store pattern, let user click Solve
+        set({
+            playing: false, scramble: [], solution: [], step: 0,
+            mode: 'idle', sidePanel: 'Custom pattern applied. Click Solve to begin.',
+            sidePanelErr: '', sidePanelSolved: false,
+            customPattern: faceMap
+        });
     }, [set]);
 
     const value = {
         state, set, engineRef, speedRef,
         scramble, solve, stopPlaying,
         nextStep, prevStep, firstStep, lastStep, jumpToStep,
-        reset, applyColorState,
+        reset, applyColorState, setMethod,
     };
 
     return <CubeCtx.Provider value={value}>{children}</CubeCtx.Provider>;

@@ -6,8 +6,8 @@ import { useCubeState } from '../hooks/useCubeState.jsx';
 import '../styles/BottomBar.css';
 
 export default function BottomBar({ onOpenEditor, onOpenCamera, onOpenNotation }) {
-    const { state, scramble, solve, reset, speedRef } = useCubeState();
-    const { mode, solution, step } = state;
+    const { state, scramble, solve, reset, speedRef, setMethod } = useCubeState();
+    const { mode, solution, step, solverMethod } = state;
     const [speed, setSpeed] = useState(5);
 
     const handleSpeedChange = (e) => {
@@ -28,6 +28,17 @@ export default function BottomBar({ onOpenEditor, onOpenCamera, onOpenNotation }
                 <span className="speed-val">{speed}</span>
             </div>
 
+            <div className="method-toggle">
+                <button
+                    className={`method-btn ${solverMethod === 'optimal' ? 'active' : ''}`}
+                    onClick={() => setMethod('optimal')}
+                >Optimal</button>
+                <button
+                    className={`method-btn ${solverMethod === 'beginner' ? 'active' : ''}`}
+                    onClick={() => setMethod('beginner')}
+                >Beginner</button>
+            </div>
+
             <div className="action-buttons">
                 <button
                     className="btn"
@@ -40,10 +51,10 @@ export default function BottomBar({ onOpenEditor, onOpenCamera, onOpenNotation }
 
                 <button
                     className="btn"
-                    disabled={mode !== 'ready' && mode !== 'paused'}
+                    disabled={mode === 'scrambling' || mode === 'solving'}
                     onClick={() => {
-                        // Start solve loop
-                        solve(solution, step);
+                        // Start solve loop or compute solution
+                        solve(solution, step, state.customPattern);
                     }}
                 >Solve</button>
 

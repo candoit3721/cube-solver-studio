@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e:*)",
+      "Bash(node:*)",
+      "Bash(npx vite build:*)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}

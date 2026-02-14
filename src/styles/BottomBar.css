@@ -53,6 +53,34 @@
     color: var(--text);
 }
 
+.method-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(12px);
+}
+
+.method-btn {
+    font-family: var(--font);
+    font-size: 12px;
+    padding: 4px 14px;
+    border-radius: 18px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.method-btn.active {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+}
+
 .action-buttons {
     display: flex;
     gap: 8px;

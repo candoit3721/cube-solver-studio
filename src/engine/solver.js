@@ -3,6 +3,8 @@
  * cubejs is loaded via <script> tag in index.html (global `Cube`).
  */
 
+import { faceMapToState, applyMoves, isSolved } from './cubeState.js';
+
 let solverReady = false;
 
 /** Initialize the solver (call once on app start) */
@@ -38,29 +40,65 @@ export function parseSolverMoves(solStr) {
 }
 
 /**
- * Solve a given faceMap. Returns { moves: string[], error?: string }.
+ * Verify that a move sequence solves the given faceMap.
+ */
+export function verifySolution(faceMap, moves) {
+    const state = faceMapToState(faceMap);
+    const result = applyMoves(state, moves);
+    return isSolved(result);
+}
+
+// Persistent worker instance — reused across solves to avoid
+// expensive re-initialization of pruning tables.
+let worker = null;
+
+function getWorker() {
+    if (!worker) {
+        worker = new Worker('/solver-worker.js');
+    }
+    return worker;
+}
+
+/**
+ * Solve a given faceMap ASYNC using Web Worker.
+ * Returns Promise resolving to { moves: string[], error?: string }.
  */
 export function solveFaceMap(faceMap) {
-    if (!solverReady || typeof window.Cube === 'undefined') {
-        return { moves: [], error: 'Solver is still initializing, please wait a moment and try again.' };
-    }
-
-    try {
+    return new Promise((resolve) => {
         const faceletStr = faceMapToFaceletString(faceMap);
-        const cube = window.Cube.fromString(faceletStr);
-        const solutionStr = cube.solve();
-        const moves = parseSolverMoves(solutionStr);
+        const w = getWorker();
 
-        if (moves.length > 0) {
-            return { moves };
-        } else {
-            return { moves: [], solved: true };
-        }
-    } catch (err) {
-        console.error('[solver] Error:', err);
-        return {
-            moves: [],
-            error: `Could not solve: ${err.message || 'invalid pattern'}. Ensure each color appears exactly 9 times.`,
+        // 15s timeout — first call may need to build pruning tables
+        const timeout = setTimeout(() => {
+            w.terminate();
+            worker = null;
+            resolve({ moves: [], error: "Solver timed out. Pattern may be unsolvable." });
+        }, 15000);
+
+        w.onmessage = (e) => {
+            clearTimeout(timeout);
+            const { success, solution, error } = e.data;
+            if (success) {
+                const moves = parseSolverMoves(solution);
+                // Verify the solution actually solves the cube
+                if (moves.length > 0 && !verifySolution(faceMap, moves)) {
+                    console.warn('[solver] Solution verification failed:', solution);
+                    resolve({ moves, error: "Solution did not fully solve the cube." });
+                } else {
+                    resolve({ moves });
+                }
+            } else {
+                resolve({ moves: [], error: "Solver error: " + error });
+            }
         };
-    }
+
+        w.onerror = (e) => {
+            clearTimeout(timeout);
+            w.terminate();
+            worker = null;
+            resolve({ moves: [], error: "Worker error: " + e.message });
+        };
+
+        w.postMessage({ faceletStr });
+    });
 }

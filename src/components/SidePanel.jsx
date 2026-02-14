@@ -1,41 +1,47 @@
 /**
  * SidePanel — solution phases, method selector, step highlighting.
  */
-import { useState } from 'react';
 import { useCubeState } from '../hooks/useCubeState.jsx';
 import '../styles/SidePanel.css';
 
-const BEGINNER_PHASES = [
-    { name: 'White Cross', desc: 'Form a cross on the white face.', icon: '✚' },
-    { name: 'White Corners', desc: 'Place white corner pieces.', icon: '◱' },
-    { name: 'Second Layer', desc: 'Insert middle layer edges.', icon: '▬' },
-    { name: 'Yellow Cross', desc: 'Orient yellow edges for a cross.', icon: '✚' },
-    { name: 'Yellow Edges', desc: 'Position yellow cross edges.', icon: '↻' },
-    { name: 'Yellow Corners Position', desc: 'Move yellow corners to correct spots.', icon: '◲' },
-    { name: 'Yellow Corners Orient', desc: 'Twist yellow corners to complete.', icon: '✦' },
-];
-
-const ADVANCED_PHASES = [
-    { name: 'Cross', desc: 'Solve the bottom cross efficiently.', icon: '✚' },
-    { name: 'F2L', desc: 'Pair and insert corner+edge into slots.', icon: '▦' },
-    { name: 'OLL', desc: 'Orient all last-layer pieces. 57 algorithms.', icon: '⬛' },
-    { name: 'PLL', desc: 'Permute last-layer pieces. 21 algorithms.', icon: '↺' },
-];
+// Simplified phase display for Kociemba solver results
+// We group moves into chunks for readability, as optimal solutions don't follow beginner phases.
 
 export default function SidePanel({ open, onToggle }) {
     const { state, jumpToStep } = useCubeState();
-    const { solution, step, mode, sidePanelErr, sidePanelSolved } = state;
-    const [method, setMethod] = useState('beginner');
+    const { solution, step, sidePanelErr, sidePanelSolved, phases } = state;
 
-    const phases = method === 'beginner' ? BEGINNER_PHASES : ADVANCED_PHASES;
-    const phaseCount = phases.length;
-    const movesPerPhase = Math.max(1, Math.ceil(solution.length / phaseCount));
-
-    const phaseGroups = phases.map((p, i) => {
-        const start = i * movesPerPhase;
-        const end = Math.min(start + movesPerPhase, solution.length);
-        return { ...p, moves: solution.slice(start, end), startIdx: start, endIdx: end };
-    }).filter(pg => pg.moves.length > 0);
+    // Build phase groups: use real phases from beginner solver, or chunk for optimal
+    const phaseGroups = [];
+    if (solution.length > 0) {
+        if (phases && phases.length > 0) {
+            let offset = 0;
+            for (const phase of phases) {
+                if (phase.moves.length > 0) {
+                    phaseGroups.push({
+                        name: phase.name,
+                        desc: `${phase.moves.length} move${phase.moves.length !== 1 ? 's' : ''}`,
+                        moves: phase.moves,
+                        startIdx: offset,
+                        endIdx: offset + phase.moves.length,
+                    });
+                }
+                offset += phase.moves.length;
+            }
+        } else {
+            const CHUNK_SIZE = 5;
+            for (let i = 0; i < solution.length; i += CHUNK_SIZE) {
+                const chunk = solution.slice(i, i + CHUNK_SIZE);
+                phaseGroups.push({
+                    name: `Part ${Math.floor(i / CHUNK_SIZE) + 1}`,
+                    desc: `Moves ${i + 1} - ${Math.min(i + CHUNK_SIZE, solution.length)}`,
+                    moves: chunk,
+                    startIdx: i,
+                    endIdx: i + chunk.length,
+                });
+            }
+        }
+    }
 
     const renderOverview = () => {
         if (sidePanelErr) {
@@ -45,10 +51,26 @@ export default function SidePanel({ open, onToggle }) {
             return <><strong>Already Solved!</strong><br />The pattern is already in the solved state.</>;
         }
         if (solution.length === 0) return null;
-        if (method === 'beginner') {
-            return <><strong>Layer-by-Layer Method</strong><br />Solves the cube one layer at a time.<br /><strong>{solution.length} moves total</strong></>;
+
+        if (phases && phases.length > 0) {
+            return (
+                <>
+                    <strong>Beginner&apos;s Method</strong><br />Layer-by-layer solution in {phaseGroups.length} phases.<br /><strong>{solution.length} moves total</strong>
+                </>
+            );
         }
-        return <><strong>CFOP Method (Fridrich)</strong><br />Advanced speedcubing method: Cross → F2L → OLL → PLL.<br /><strong>{solution.length} moves total</strong></>;
+
+        return (
+            <>
+                <strong>Optimal Solution</strong><br />Found shortest path using Kociemba algorithm.<br /><strong>{solution.length} moves total</strong>
+                <div style={{ marginTop: '0.8rem', padding: '0.6rem', background: '#2a2a35', borderRadius: '4px', border: '1px solid #444', fontSize: '0.9em', lineHeight: '1.4' }}>
+                    ⚠️ <strong>Hold Cube Correctly:</strong><br />
+                    1. <span style={{ color: '#2ecc71', fontWeight: 'bold' }}>Green Center</span> facing <strong>YOU</strong><br />
+                    2. <span style={{ color: '#fff', fontWeight: 'bold' }}>White Center</span> facing <strong>UP</strong><br />
+                    <em>(Use &apos;Play&apos; button to confirm moves)</em>
+                </div>
+            </>
+        );
     };
 
     const overview = renderOverview();
@@ -60,11 +82,7 @@ export default function SidePanel({ open, onToggle }) {
             </button>
             <aside className={`side-panel ${open ? 'open' : ''}`}>
                 <div className="sp-header">
-                    <h3>Solution</h3>
-                    <select value={method} onChange={(e) => setMethod(e.target.value)} className="method-select">
-                        <option value="beginner">Beginner</option>
-                        <option value="advanced">Advanced (CFOP)</option>
-                    </select>
+                    <h3>Solution Steps</h3>
                 </div>
 
                 {overview && <div className="sp-overview">{overview}</div>}
@@ -77,7 +95,7 @@ export default function SidePanel({ open, onToggle }) {
 
                         return (
                             <div key={pi}>
-                                <div className="sp-phase-header">{pg.icon} Phase {pi + 1}: {pg.name}</div>
+                                <div className="sp-phase-header">Step {pi + 1}: {pg.name}</div>
                                 <div
                                     className={cardClass}
                                     onClick={() => jumpToStep(pg.startIdx, step, solution)}

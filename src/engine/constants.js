@@ -14,11 +14,11 @@ export const FACE_HEX = {
 export const FACES = ['U', 'D', 'R', 'L', 'F', 'B'];
 
 export const MOVES = {
-  'U':  { axis: 'y', layer:  1, angle:  Math.PI / 2 },
-  "U'": { axis: 'y', layer:  1, angle: -Math.PI / 2 },
+  'U':  { axis: 'y', layer:  1, angle: -Math.PI / 2 },
+  "U'": { axis: 'y', layer:  1, angle:  Math.PI / 2 },
   'U2': { axis: 'y', layer:  1, angle:  Math.PI },
-  'D':  { axis: 'y', layer: -1, angle: -Math.PI / 2 },
-  "D'": { axis: 'y', layer: -1, angle:  Math.PI / 2 },
+  'D':  { axis: 'y', layer: -1, angle:  Math.PI / 2 },
+  "D'": { axis: 'y', layer: -1, angle: -Math.PI / 2 },
   'D2': { axis: 'y', layer: -1, angle:  Math.PI },
   'R':  { axis: 'x', layer:  1, angle: -Math.PI / 2 },
   "R'": { axis: 'x', layer:  1, angle:  Math.PI / 2 },

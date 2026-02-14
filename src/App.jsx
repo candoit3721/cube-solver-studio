@@ -23,10 +23,10 @@ function AppInner() {
 
   // Open side panel automatically when there's a solution
   useEffect(() => {
-    if (state.solution.length > 0 && !panelOpen) {
+    if ((state.solution.length > 0 || state.sidePanelErr) && !panelOpen) {
       setPanelOpen(true);
     }
-  }, [state.solution.length]);
+  }, [state.solution.length, state.sidePanelErr]);
 
   // Keyboard shortcuts
   useEffect(() => {
