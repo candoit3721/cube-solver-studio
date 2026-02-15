@@ -1,7 +1,7 @@
 /**
  * App — main layout shell, wires all components together.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { CubeProvider, useCubeState } from './hooks/useCubeState.jsx';
 import CubeCanvas from './components/CubeCanvas.jsx';
 import TopBar from './components/TopBar.jsx';
@@ -10,7 +10,6 @@ import SidePanel from './components/SidePanel.jsx';
 import EditorModal from './components/EditorModal.jsx';
 import CameraModal from './components/CameraModal.jsx';
 import NotationModal from './components/NotationModal.jsx';
-import { initSolver } from './engine/solver.js';
 import './App.css';
 
 function AppInner() {
@@ -73,11 +72,6 @@ function AppInner() {
 }
 
 export default function App() {
-  useEffect(() => {
-    // Initialize the Kociemba solver in the background
-    initSolver();
-  }, []);
-
   return (
     <CubeProvider>
       <AppInner />

@@ -4,9 +4,7 @@
 import { createContext, useContext, useReducer, useRef, useCallback } from 'react';
 import { FACES, INVERT } from '../engine/constants.js';
 import { doMoveAnimated, doMoveInstant, isBusy } from '../engine/animator.js';
-import { solveFaceMap } from '../engine/solver.js';
-import { solveLayered } from '../engine/layeredSolver.js';
-import { createSolvedState, applyMoves as applyMovesState, faceMapToState } from '../engine/cubeState.js';
+import { solveCube, validateCube } from '../api/cubeApi.js';
 
 const CubeCtx = createContext(null);
 
@@ -79,19 +77,13 @@ export function CubeProvider({ children }) {
             await doMoveAnimated(eng.scene, eng.cubies, mv, 70);
         }
 
-        // Compute solution based on current solver method
+        // Compute solution via API
         const method = stateRef.current.solverMethod;
-        if (method === 'beginner') {
-            const scrambledState = applyMovesState(createSolvedState(), moves);
-            const result = solveLayered(scrambledState);
-            if (result.error) {
-                set({ mode: 'ready', solution: [], step: 0, sidePanelErr: result.error, phases: null });
-            } else {
-                set({ mode: 'ready', solution: result.moves, step: 0, phases: result.phases });
-            }
-        } else {
-            const solution = [...moves].reverse().map(INVERT);
-            set({ mode: 'ready', solution, step: 0, phases: null });
+        try {
+            const data = await solveCube(moves.join(' '), { format: 'scramble', method });
+            set({ mode: 'ready', solution: data.moves, step: 0, phases: data.phases || null });
+        } catch (err) {
+            set({ mode: 'ready', solution: [], step: 0, sidePanelErr: err.message, phases: null });
         }
     }, [genScramble, set]);
 
@@ -107,38 +99,19 @@ export function CubeProvider({ children }) {
             const method = stateRef.current.solverMethod;
             set({ mode: 'solving', sidePanel: 'Computing solution...', sidePanelErr: '', phases: null });
 
-            // Yield to UI
-            await new Promise(r => setTimeout(r, 50));
+            try {
+                const data = await solveCube(customPattern, { format: 'faceMap', method });
 
-            if (method === 'beginner') {
-                const cubeState = faceMapToState(customPattern);
-                const result = solveLayered(cubeState);
-                if (result.error) {
-                    set({ mode: 'idle', sidePanel: '', sidePanelErr: result.error, phases: null });
-                    return;
-                }
-                if (result.moves.length === 0) {
+                if (data.alreadySolved) {
                     set({ mode: 'idle', sidePanelSolved: true, sidePanel: 'Already solved!', sidePanelErr: '', phases: null });
                     return;
                 }
-                sol = result.moves;
-                set({ solution: sol, step: 0, mode: 'ready', sidePanel: `Solution: ${sol.length} moves`, phases: result.phases });
-            } else {
-                // Log for debug
-                console.time('solve');
-                const result = await solveFaceMap(customPattern);
-                console.timeEnd('solve');
 
-                if (result.error) {
-                    set({ mode: 'idle', sidePanel: '', sidePanelErr: result.error });
-                    return;
-                } else if (result.solved) {
-                    set({ mode: 'idle', sidePanelSolved: true, sidePanel: 'Already solved!', sidePanelErr: '' });
-                    return;
-                }
-
-                sol = result.moves;
-                set({ solution: sol, step: 0, mode: 'ready', sidePanel: `Solution: ${sol.length} moves`, phases: null });
+                sol = data.moves;
+                set({ solution: sol, step: 0, mode: 'ready', sidePanel: `Solution: ${sol.length} moves`, phases: data.phases || null });
+            } catch (err) {
+                set({ mode: 'idle', sidePanel: '', sidePanelErr: err.message, phases: null });
+                return;
             }
 
             // Wait a bit before playing
@@ -236,9 +209,34 @@ export function CubeProvider({ children }) {
         dispatch({ type: 'RESET' });
     }, []);
 
-    /** Switch solver method */
-    const setMethod = useCallback((method) => {
-        set({ solverMethod: method, phases: null });
+    /** Switch solver method — recompute solution if one exists */
+    const setMethod = useCallback(async (method) => {
+        const current = stateRef.current;
+        const eng = engineRef.current;
+
+        // If there's an active solution, jump cube back to scrambled state and recompute
+        if (current.solution.length > 0 && eng) {
+            let s = current.step;
+            while (s > 0) { s--; doMoveInstant(eng.scene, eng.cubies, INVERT(current.solution[s])); }
+
+            if (current.scrambleMoves && current.scrambleMoves.length > 0) {
+                set({ solverMethod: method, solution: [], step: 0, phases: null, mode: 'ready', sidePanel: 'Recomputing...' });
+                try {
+                    const data = await solveCube(current.scrambleMoves.join(' '), { format: 'scramble', method });
+                    set({ solution: data.moves, step: 0, phases: data.phases || null, mode: 'ready', sidePanel: '' });
+                } catch (err) {
+                    set({ solution: [], step: 0, phases: null, sidePanelErr: err.message, mode: 'ready' });
+                }
+            } else if (current.customPattern) {
+                // Custom pattern — clear solution, let user click Solve again
+                set({ solverMethod: method, solution: [], step: 0, phases: null, mode: 'idle',
+                      sidePanel: 'Method changed. Click Solve to recompute.' });
+            } else {
+                set({ solverMethod: method, phases: null });
+            }
+        } else {
+            set({ solverMethod: method, phases: null });
+        }
     }, [set]);
 
     /** Apply a custom faceMap pattern w/o solving immediately */
@@ -248,13 +246,27 @@ export function CubeProvider({ children }) {
 
         eng.createCube(faceMap);
 
-        // Reset state, store pattern, let user click Solve
+        // Reset state, store pattern
         set({
             playing: false, scramble: [], solution: [], step: 0,
-            mode: 'idle', sidePanel: 'Custom pattern applied. Click Solve to begin.',
+            mode: 'idle', sidePanel: 'Validating pattern...',
             sidePanelErr: '', sidePanelSolved: false,
             customPattern: faceMap
         });
+
+        // Validate via API
+        try {
+            const data = await validateCube(faceMap, { format: 'faceMap' });
+            if (!data.valid) {
+                set({ sidePanelErr: 'Invalid cube pattern. Please check your colors.', sidePanel: '' });
+            } else if (data.isSolved) {
+                set({ sidePanelSolved: true, sidePanel: 'Cube is already solved!' });
+            } else {
+                set({ sidePanel: 'Custom pattern applied. Click Solve to begin.' });
+            }
+        } catch (err) {
+            set({ sidePanelErr: err.message, sidePanel: '' });
+        }
     }, [set]);
 
     const value = {

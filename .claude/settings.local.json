@@ -4,7 +4,13 @@
       "Bash(node -e:*)",
       "Bash(node:*)",
       "Bash(npx vite build:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm view:*)",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)",
+      "Bash(curl:*)",
+      "Bash(kill:*)",
+      "Bash(wc:*)"
     ]
   }
 }

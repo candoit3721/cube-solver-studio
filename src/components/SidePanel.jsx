@@ -4,8 +4,43 @@
 import { useCubeState } from '../hooks/useCubeState.jsx';
 import '../styles/SidePanel.css';
 
-// Simplified phase display for Kociemba solver results
-// We group moves into chunks for readability, as optimal solutions don't follow beginner phases.
+const PHASE_INFO = {
+    'White Cross': {
+        why: 'The cross is the foundation — every layer-by-layer solve starts here. You\'re building a "+" shape on the white face while ensuring each edge\'s side color matches its center.',
+        goal: 'White edges aligned with their center colors',
+        alg: 'Intuitive — no fixed algorithm, move edges into place one by one',
+    },
+    'White Corners': {
+        why: 'With the cross done, slot each corner into position using a simple "insert" trigger (R\' D\' R D). This completes the entire first layer.',
+        goal: 'First layer fully solved',
+        alg: 'R\' D\' R D — repeated until corner is oriented correctly',
+    },
+    'Middle Layer': {
+        why: 'Now solve the middle ring of edges. Each edge is inserted from the bottom layer using one of two mirror algorithms (left or right insert).',
+        goal: 'First two layers (F2L) complete',
+        alg: 'U R U\' R\' U\' F\' U F (right) or U\' L\' U L U F U\' F\' (left)',
+    },
+    'Yellow Cross': {
+        why: 'Flip the cube so yellow is on top. Orient yellow edges to form a cross — you may start with a dot, an "L", or a line shape.',
+        goal: 'Yellow cross on top face',
+        alg: 'F R U R\' U\' F\' — apply 1-3 times depending on starting shape',
+    },
+    'Yellow Edge Perm': {
+        why: 'The yellow cross exists but the side colors may be wrong. Cycle edges around until each matches its center color.',
+        goal: 'Yellow cross edges match their centers',
+        alg: 'R U R\' U R U2 R\' — swap edges into position',
+    },
+    'Yellow Corner Perm': {
+        why: 'Move yellow corners to their correct positions (colors may still be twisted). Look for a corner that\'s already correct and use it as an anchor.',
+        goal: 'All corners in correct positions',
+        alg: 'U R U\' L\' U R\' U\' L — 3-corner cycle',
+    },
+    'Yellow Corner Orient': {
+        why: 'The final step! Twist each corner in-place using R\' D\' R D until its yellow sticker faces up. Don\'t panic if the cube looks scrambled mid-algorithm — it resolves.',
+        goal: 'Cube fully solved',
+        alg: 'R\' D\' R D — repeated per corner, then U to rotate top',
+    },
+};
 
 export default function SidePanel({ open, onToggle }) {
     const { state, jumpToStep } = useCubeState();
@@ -55,19 +90,28 @@ export default function SidePanel({ open, onToggle }) {
         if (phases && phases.length > 0) {
             return (
                 <>
-                    <strong>Beginner&apos;s Method</strong><br />Layer-by-layer solution in {phaseGroups.length} phases.<br /><strong>{solution.length} moves total</strong>
+                    <strong>Beginner&apos;s Method</strong><br />
+                    Layer-by-layer solution in {phaseGroups.length} phases.<br />
+                    <strong>{solution.length} moves total</strong>
+                    <div className="sp-learn-note">
+                        This is the standard LBL (Layer-By-Layer) method — the most popular way to learn solving. Each phase has a clear goal and uses simple, repeatable algorithms.
+                    </div>
                 </>
             );
         }
 
         return (
             <>
-                <strong>Optimal Solution</strong><br />Found shortest path using Kociemba algorithm.<br /><strong>{solution.length} moves total</strong>
-                <div style={{ marginTop: '0.8rem', padding: '0.6rem', background: '#2a2a35', borderRadius: '4px', border: '1px solid #444', fontSize: '0.9em', lineHeight: '1.4' }}>
-                    ⚠️ <strong>Hold Cube Correctly:</strong><br />
-                    1. <span style={{ color: '#2ecc71', fontWeight: 'bold' }}>Green Center</span> facing <strong>YOU</strong><br />
-                    2. <span style={{ color: '#fff', fontWeight: 'bold' }}>White Center</span> facing <strong>UP</strong><br />
-                    <em>(Use &apos;Play&apos; button to confirm moves)</em>
+                <strong>Optimal Solution</strong><br />
+                <strong>{solution.length} moves</strong> — shortest path via Kociemba&apos;s algorithm.
+                <div className="sp-callout">
+                    <strong>Hold Cube:</strong>{' '}
+                    <span style={{ color: '#2ecc71' }}>Green</span> toward you,{' '}
+                    <span style={{ color: '#fff' }}>White</span> on top
+                </div>
+                <div className="sp-learn-note">
+                    This is a computer-optimized solution — the moves don&apos;t follow human-intuitive steps. It&apos;s great for speed, but not for learning.<br /><br />
+                    <strong>Want to understand each step?</strong> Switch to <strong>Beginner</strong> mode for a guided, phase-by-phase walkthrough with explanations.
                 </div>
             </>
         );
@@ -89,25 +133,43 @@ export default function SidePanel({ open, onToggle }) {
 
                 <div className="sp-steps">
                     {phaseGroups.map((pg, pi) => {
+                        const info = PHASE_INFO[pg.name];
                         let cardClass = 'sp-card';
                         if (step >= pg.endIdx) cardClass += ' done';
                         else if (step >= pg.startIdx && step < pg.endIdx) cardClass += ' active';
 
                         return (
                             <div key={pi}>
-                                <div className="sp-phase-header">Step {pi + 1}: {pg.name}</div>
+                                <div className="sp-phase-header">
+                                    Step {pi + 1}: {pg.name}
+                                    {info && <span className="sp-goal">Goal: {info.goal}</span>}
+                                </div>
                                 <div
                                     className={cardClass}
                                     onClick={() => jumpToStep(pg.startIdx, step, solution)}
                                 >
+                                    {info && (
+                                        <div className="sp-explanation">
+                                            {info.why}
+                                            <div className="sp-algorithm">Algorithm: <code>{info.alg}</code></div>
+                                        </div>
+                                    )}
                                     <div className="sp-desc">{pg.desc}</div>
                                     <div className="sp-moves">{pg.moves.join(' ')}</div>
-                                    <div className="sp-phase">{pg.moves.length} move{pg.moves.length !== 1 ? 's' : ''}</div>
                                 </div>
                             </div>
                         );
                     })}
                 </div>
+
+                {solution.length > 0 && phases && phases.length > 0 && (
+                    <div className="sp-resources">
+                        <div className="sp-resources-title">Learn More</div>
+                        <a href="https://jperm.net/3x3/cfop" target="_blank" rel="noopener noreferrer">JPerm — Beginner &amp; CFOP tutorials</a>
+                        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/" target="_blank" rel="noopener noreferrer">Ruwix — Layer-by-layer guide</a>
+                        <a href="https://www.cubeskills.com/tutorials/beginners-method" target="_blank" rel="noopener noreferrer">CubeSkills — Feliks Zemdegs&apos; tutorials</a>
+                    </div>
+                )}
             </aside>
         </>
     );
