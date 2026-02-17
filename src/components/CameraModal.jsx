@@ -31,8 +31,7 @@ function faceGridToSingmaster(faceId, grid) {
 function fullSingmaster(scanned) {
     return ['U', 'D', 'F', 'B', 'R', 'L']
         .filter(f => scanned[f])
-        .map(f => faceGridToSingmaster(f, scanned[f]))
-        .join('  ');
+        .map(f => faceGridToSingmaster(f, scanned[f]));
 }
 
 
@@ -599,15 +598,18 @@ export default function CameraModal({ open, onClose }) {
             <div className="modal-content cam-modal" onClick={e => e.stopPropagation()}>
                 <h2>Camera Scanner</h2>
 
-                {/* ── Face selector + Video feed (scanning phase) ── */}
+                {/* ── Face selector (scanning phase only) ── */}
                 {phase === 'scanning' && (
-                    <>
-                        <div className="cam-face-selector">
-                            <span className="cam-face-selector-label">Scanning for:</span>
+                    <div className="cam-face-selector">
+                        <div className="cam-face-selector-label">
+                            Scan: <span className="cam-target-name" style={{ color: FACE_HEX[targetFace] }}>{targetFace} face</span>
+                        </div>
+                        <div className="cam-face-btns">
                             {SCAN_ORDER.map(f => (
                                 <button
                                     key={f}
                                     className={`cam-face-btn ${f === targetFace ? 'target' : ''} ${scanned[f] ? 'done' : ''}`}
+                                    style={{ background: FACE_HEX[f] }}
                                     onClick={() => {
                                         centerMismatchCount.current = 0;
                                         setCenterMismatch(null);
@@ -623,34 +625,38 @@ export default function CameraModal({ open, onClose }) {
                                 </button>
                             ))}
                         </div>
+                    </div>
+                )}
 
-                        <div className="cam-video-wrap">
-                            <video ref={videoRef} autoPlay playsInline muted className="cam-video" />
-                            <canvas ref={overlayRef} className="cam-overlay-canvas" />
-                            {livePreview && (
-                                <div className={`cam-live-badge ${!scanned[targetFace] ? 'accumulating' : ''}`}>
-                                    Scanning for {targetFace} &middot; {livePreview.confidence}%
-                                </div>
-                            )}
-                            {centerMismatch && !scanned[targetFace] && (
-                                <div className="cam-mismatch-warning">
-                                    Center looks like {centerMismatch} — wrong face?
-                                </div>
-                            )}
+                {/* ── Video feed — always mounted to keep stream alive, hidden when not scanning ── */}
+                <div className="cam-video-wrap" style={{ display: phase === 'scanning' ? '' : 'none' }}>
+                    <video ref={videoRef} autoPlay playsInline muted className="cam-video" />
+                    <canvas ref={overlayRef} className="cam-overlay-canvas" />
+                    {livePreview && phase === 'scanning' && (
+                        <div className={`cam-live-badge ${!scanned[targetFace] ? 'accumulating' : ''}`}>
+                            Scanning for {targetFace} &middot; {livePreview.confidence}%
                         </div>
+                    )}
+                    {centerMismatch && !scanned[targetFace] && phase === 'scanning' && (
+                        <div className="cam-mismatch-warning">
+                            Center looks like {centerMismatch} — wrong face?
+                        </div>
+                    )}
+                </div>
 
-                        <div className="cam-scale-slider">
-                            <label>Guide size:</label>
-                            <input
-                                type="range"
-                                min={20}
-                                max={80}
-                                value={Math.round(guideSize * 100)}
-                                onChange={e => setGuideSize(Number(e.target.value) / 100)}
-                            />
-                            <span className="cam-scale-value">{Math.round(guideSize * 100)}%</span>
-                        </div>
-                    </>
+                {/* ── Guide size slider (scanning phase only) ── */}
+                {phase === 'scanning' && (
+                    <div className="cam-scale-slider">
+                        <label>Guide size:</label>
+                        <input
+                            type="range"
+                            min={20}
+                            max={80}
+                            value={Math.round(guideSize * 100)}
+                            onChange={e => setGuideSize(Number(e.target.value) / 100)}
+                        />
+                        <span className="cam-scale-value">{Math.round(guideSize * 100)}%</span>
+                    </div>
                 )}
 
                 {/* ── Status ── */}
@@ -667,7 +673,11 @@ export default function CameraModal({ open, onClose }) {
                 {count > 0 && phase !== 'editing' && (
                     <div className="cam-singmaster">
                         <div className="cam-singmaster-label">Singmaster</div>
-                        <code className="cam-singmaster-code">{singmaster}</code>
+                        <div className="cam-singmaster-grid">
+                            {singmaster.map((entry, i) => (
+                                <code key={i} className="cam-singmaster-entry">{entry}</code>
+                            ))}
+                        </div>
                     </div>
                 )}
 
@@ -676,7 +686,11 @@ export default function CameraModal({ open, onClose }) {
                     <>
                         <div className="cam-singmaster">
                             <div className="cam-singmaster-label">Singmaster</div>
-                            <code className="cam-singmaster-code">{singmaster}</code>
+                            <div className="cam-singmaster-grid">
+                                {singmaster.map((entry, i) => (
+                                    <code key={i} className="cam-singmaster-entry">{entry}</code>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="cam-edit-net">
