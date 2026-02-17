@@ -1,7 +1,7 @@
 /**
  * App — main layout shell, wires all components together.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CubeProvider, useCubeState } from './hooks/useCubeState.jsx';
 import CubeCanvas from './components/CubeCanvas.jsx';
 import TopBar from './components/TopBar.jsx';
@@ -10,13 +10,33 @@ import SidePanel from './components/SidePanel.jsx';
 import EditorModal from './components/EditorModal.jsx';
 import CameraModal from './components/CameraModal.jsx';
 import NotationModal from './components/NotationModal.jsx';
+import { checkHealth } from './api/cubeApi.js';
 import './App.css';
+
+function useBackendHealth() {
+  const [online, setOnline] = useState(true);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const poll = async () => {
+      const ok = await checkHealth();
+      if (!cancelled) setOnline(ok);
+    };
+    poll();
+    intervalRef.current = setInterval(poll, 5000);
+    return () => { cancelled = true; clearInterval(intervalRef.current); };
+  }, []);
+
+  return online;
+}
 
 function AppInner() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [notationOpen, setNotationOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const backendOnline = useBackendHealth();
 
   const { state, scramble, solve, stopPlaying, nextStep, prevStep, firstStep, lastStep, reset } = useCubeState();
 
@@ -56,6 +76,9 @@ function AppInner() {
 
   return (
     <>
+      <div className={`server-banner ${backendOnline ? '' : 'show'}`}>
+        Server unavailable — start the backend to enable solving
+      </div>
       <CubeCanvas />
       <TopBar />
       <BottomBar

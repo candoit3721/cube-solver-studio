@@ -1,12 +1,22 @@
 import { ValidationError } from '../errors/AppError.js';
-import { EDGES, CORNERS } from '../../src/engine/cubeState.js';
+import { EDGES, CORNERS, EDGE_NAMES } from '../../src/engine/cubeState.js';
 
 /**
- * Reference edge orientation: which face is the "primary" face for each edge position.
- * For an edge at position i, the first facelet index in EDGES[i] belongs to the
- * "primary" face of that slot.
+ * Edge orientation reference: the first facelet in each EDGES[i] entry is always
+ * on a U, D, F, or B face (never R or L). This is the "reference facelet."
  */
-const EDGE_PRIMARY_FACES = ['U', 'U', 'U', 'U', 'F', 'F', 'B', 'B', 'D', 'D', 'D', 'D'];
+
+/** Map facelet index to face name and grid position label */
+const FACE_OFFSET = { U: 0, R: 9, F: 18, D: 27, L: 36, B: 45 };
+const POS_LABELS = ['top-left', 'top-center', 'top-right',
+                    'mid-left', 'center', 'mid-right',
+                    'bot-left', 'bot-center', 'bot-right'];
+function faceletLabel(idx) {
+  for (const [face, off] of Object.entries(FACE_OFFSET)) {
+    if (idx >= off && idx < off + 9) return `${face} face ${POS_LABELS[idx - off]}`;
+  }
+  return `index ${idx}`;
+}
 
 /**
  * Reference corner orientation: which face is the "primary" face for each corner position.
@@ -18,27 +28,25 @@ const CORNER_PRIMARY_FACES = ['U', 'U', 'U', 'U', 'D', 'D', 'D', 'D'];
 /**
  * Determine edge orientation (flip).
  * Returns 0 if correctly oriented, 1 if flipped.
+ *
+ * Kociemba edge orientation: each piece has a "reference" sticker —
+ * the U/D colored sticker if it has one, otherwise the F/B colored sticker.
+ * The edge is oriented (0) iff that reference color sits at f1 (the slot's
+ * reference facelet, which is always on a U/D/F/B face).
+ *
+ * We must inspect BOTH facelets to identify the piece type:
+ *   - Piece with U/D sticker: oriented iff c1 ∈ {U, D}
+ *   - E-layer piece (no U/D):  oriented iff c1 ∈ {F, B}
  */
 function edgeOrientation(state, edgeIdx) {
   const [f1, f2] = EDGES[edgeIdx];
   const c1 = state[f1];
   const c2 = state[f2];
 
-  // Find where this edge belongs
-  const primaryFace = EDGE_PRIMARY_FACES[edgeIdx];
-
-  // An edge is correctly oriented (0) if its primary-face color is on the primary-face slot.
-  // For U/D edges: the U/D color should be at the first facelet position.
-  // For E-slice edges: the F/B color should be at the first facelet position.
-  const udSet = new Set(['U', 'D']);
-
-  if (udSet.has(primaryFace)) {
-    // This slot is in U or D layer. Edge is oriented if the U or D sticker is at f1.
-    return udSet.has(c1) ? 0 : 1;
+  if (c1 === 'U' || c1 === 'D' || c2 === 'U' || c2 === 'D') {
+    return (c1 === 'U' || c1 === 'D') ? 0 : 1;
   }
-  // E-layer slot. Edge is oriented if the F or B sticker is at f1.
-  const fbSet = new Set(['F', 'B']);
-  return fbSet.has(c1) ? 0 : 1;
+  return (c1 === 'F' || c1 === 'B') ? 0 : 1;
 }
 
 /**
@@ -181,12 +189,20 @@ function getCornerPermutation(state) {
 export function validateParity(facelets) {
   // Edge orientation parity
   let edgeFlipSum = 0;
+  const flippedEdges = [];
   for (let i = 0; i < 12; i++) {
-    edgeFlipSum += edgeOrientation(facelets, i);
+    const flip = edgeOrientation(facelets, i);
+    edgeFlipSum += flip;
+    if (flip) {
+      const [f1, f2] = EDGES[i];
+      flippedEdges.push(
+        `${EDGE_NAMES[i]} edge (${faceletLabel(f1)}: ${facelets[f1]}, ${faceletLabel(f2)}: ${facelets[f2]})`
+      );
+    }
   }
   if (edgeFlipSum % 2 !== 0) {
     throw new ValidationError(
-      'Edge orientation parity error: the sum of edge flips is odd, which means an edge piece has been flipped in place. This state is not reachable by legal moves.',
+      `Edge parity error: ${flippedEdges.length} flipped edges — check these stickers: ${flippedEdges.join('; ')}`,
       'edgeParity'
     );
   }
