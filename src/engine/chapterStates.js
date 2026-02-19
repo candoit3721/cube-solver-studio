@@ -80,29 +80,30 @@ export const CHAPTER_STATES = [
     R: ['R','R','R',  'R','R','R',  'R','R','R'],
   },
 
-  // 7 — Right insert SETUP: edge piece in U layer at UF position, ready for right insert.
-  // U[7]=R  → red sticker on top = "this colour goes to the Right face"
-  // F[1]=F  → green sticker faces front = matches front centre
-  // FL slot already done (F[3]=F, L[5]=L); FR slot empty (F[5]=B, R[3]=D).
+  // 7 — Right insert SETUP (yellow face up, white layer solved at bottom).
+  // U = yellow face (on top). D = white face (fully solved at bottom).
+  // U[7]=R  → red sticker on yellow face at front-centre = "goes to Right/red face"
+  // F[1]=F  → green sticker on front face = matches front centre
+  // FL, BL, BR slots solved; FR slot empty (F[5]=D, R[3]=D show wrong/yellow piece).
   {
-    U: ['U','U','U',  'U','U','U',  'U','R','U'],
-    D: ['F','L','R',  'B','D','F',  'R','L','B'],
-    F: ['F','F','F',  'F','F','B',  'D','R','L'],
-    R: ['R','R','R',  'D','R','L',  'F','B','D'],
-    L: ['L','L','L',  'B','L','L',  'R','F','D'],
-    B: ['B','B','B',  'R','B','F',  'L','D','R'],
+    U: ['D','D','D',  'D','D','D',  'D','R','D'],
+    D: ['U','U','U',  'U','U','U',  'U','U','U'],
+    F: ['F','F','F',  'F','F','D',  'F','F','F'],
+    R: ['R','R','R',  'D','R','R',  'R','R','R'],
+    L: ['L','L','L',  'L','L','L',  'L','L','L'],
+    B: ['B','B','B',  'B','B','B',  'B','B','B'],
   },
 
-  // 8 — Left insert SETUP: same edge-in-U-layer setup but for the left slot.
-  // U[7]=L  → orange sticker on top = "this colour goes to the Left face"
-  // F[1]=F  → green sticker faces front = matches front centre
-  // FR slot already done (F[5]=F, R[3]=R); FL slot empty (F[3]=B, L[5]=R).
+  // 8 — Left insert SETUP (yellow face up, white layer solved at bottom).
+  // U[7]=L  → orange sticker on yellow face at front-centre = "goes to Left/orange face"
+  // F[1]=F  → green sticker on front face = matches front centre
+  // FR, BL, BR slots solved; FL slot empty (F[3]=D, L[5]=D show wrong/yellow piece).
   {
-    U: ['U','U','U',  'U','U','U',  'U','L','U'],
-    D: ['F','R','L',  'B','D','F',  'L','R','B'],
-    F: ['F','F','F',  'B','F','F',  'D','L','R'],
-    R: ['R','R','R',  'R','R','B',  'F','D','L'],
-    L: ['L','L','L',  'D','L','R',  'B','F','D'],
-    B: ['B','B','B',  'F','B','L',  'R','D','F'],
+    U: ['D','D','D',  'D','D','D',  'D','L','D'],
+    D: ['U','U','U',  'U','U','U',  'U','U','U'],
+    F: ['F','F','F',  'D','F','F',  'F','F','F'],
+    R: ['R','R','R',  'R','R','R',  'R','R','R'],
+    L: ['L','L','L',  'L','L','D',  'L','L','L'],
+    B: ['B','B','B',  'B','B','B',  'B','B','B'],
   },
 ];

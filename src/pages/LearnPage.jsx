@@ -29,8 +29,8 @@ const CHAPTERS = [
     id: 'middle-layer',
     name: 'Middle Layer',
     goal: 'First two layers (F2L) complete',
-    why: 'Solve the 4 middle-layer edges one at a time. Hold the cube so the edge\'s front colour matches the front centre. The sticker on top of the U layer tells you which algorithm to use: if it\'s red it goes right, if it\'s orange it goes left.',
-    hold: 'White face up, solved layers at the bottom.',
+    why: 'Flip the cube so yellow is on top (white solved layer at the bottom). Solve the 4 middle-layer edges one at a time — bring each edge into the top (yellow) layer, then rotate the top layer until the edge\'s front sticker matches the front centre. The sticker on the yellow face tells you which algorithm to use: red goes right, orange goes left.',
+    hold: 'Yellow face up, white layer solved at bottom.',
     algs: [
       {
         label: '→ Right insert',
