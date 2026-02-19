@@ -5,14 +5,12 @@ import SolvePage from './pages/SolvePage.jsx';
 import LearnPage from './pages/LearnPage.jsx';
 import AlgorithmsPage from './pages/AlgorithmsPage.jsx';
 
-// Pages with Three.js require WebGL — mock them here.
-// Routing is what's under test, not the page UI.
-vi.mock('./pages/Home.jsx', () => ({
-  default: () => <div>Home</div>,
-}));
-vi.mock('./pages/SolvePage.jsx', () => ({
-  default: () => <div>Solver</div>,
-}));
+// Mock all pages in the router test — routing is what's under test, not the page UI.
+// Pages with Three.js (Home, SolvePage) require WebGL which jsdom doesn't support.
+vi.mock('./pages/Home.jsx', () => ({ default: () => <div>Home</div> }));
+vi.mock('./pages/SolvePage.jsx', () => ({ default: () => <div>Solver</div> }));
+vi.mock('./pages/LearnPage.jsx', () => ({ default: () => <div>Learn</div> }));
+vi.mock('./pages/AlgorithmsPage.jsx', () => ({ default: () => <div>Algorithms</div> }));
 
 function AppRoutes({ initialEntry = '/' }) {
   return (

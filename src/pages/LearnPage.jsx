@@ -1,3 +1,146 @@
+/**
+ * LearnPage — 7-chapter beginner Layer-by-Layer guide.
+ */
+import { Link } from 'react-router-dom';
+import '../styles/LearnPage.css';
+
+const CHAPTERS = [
+  {
+    id: 'white-cross',
+    name: 'White Cross',
+    goal: 'White edges aligned with their center colors',
+    why: "The cross is the foundation — every layer-by-layer solve starts here. You're building a \"+\" shape on the white face while ensuring each edge's side color matches its center.",
+    alg: null,
+    algNote: 'Intuitive — no fixed algorithm. Move edges into place one by one.',
+    hold: 'White face up.',
+  },
+  {
+    id: 'white-corners',
+    name: 'White Corners',
+    goal: 'First layer fully solved',
+    why: "With the cross done, slot each corner into position using a simple \"insert\" trigger. Repeat the trigger until the corner drops in correctly.",
+    alg: ["R'", "D'", 'R', 'D'],
+    algNote: 'Repeat the trigger until the corner is oriented correctly.',
+    hold: 'White face up.',
+  },
+  {
+    id: 'middle-layer',
+    name: 'Middle Layer',
+    goal: 'First two layers (F2L) complete',
+    why: 'Now solve the middle ring of edges. Each edge is inserted from the bottom layer using one of two mirror algorithms depending on which side it needs to go.',
+    alg: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
+    algNote: "Right insert (use mirror for left): U R U' R' U' F' U F",
+    hold: 'White face up, solved layers at the bottom.',
+  },
+  {
+    id: 'yellow-cross',
+    name: 'Yellow Cross',
+    goal: 'Yellow cross on top face',
+    why: "Flip the cube so yellow is on top. Orient yellow edges to form a cross. You may start with a dot, an \"L\", or a line shape — the algorithm cycles through these states.",
+    alg: ['F', 'R', 'U', "R'", "U'", "F'"],
+    algNote: 'Apply 1–3 times depending on starting shape.',
+    hold: 'Yellow face up.',
+  },
+  {
+    id: 'yellow-edge-perm',
+    name: 'Yellow Edge Permutation',
+    goal: 'Yellow cross edges match their centers',
+    why: 'The yellow cross exists but the side colors may be wrong. Cycle edges around until each edge matches its center color.',
+    alg: ['R', 'U', "R'", 'U', 'R', 'U2', "R'"],
+    algNote: 'Applies a 3-cycle of the top edges.',
+    hold: 'Yellow face up. Find a solved edge and keep it in the back.',
+  },
+  {
+    id: 'yellow-corner-perm',
+    name: 'Yellow Corner Permutation',
+    goal: 'All corners in correct positions',
+    why: "Move yellow corners to their correct positions (colors may still be twisted). Find a corner that's already correct and use it as an anchor.",
+    alg: ['U', 'R', "U'", "L'", 'U', "R'", "U'", 'L'],
+    algNote: '3-corner cycle. Repeat as needed.',
+    hold: 'Yellow face up.',
+  },
+  {
+    id: 'yellow-corner-orient',
+    name: 'Yellow Corner Orientation',
+    goal: 'Cube fully solved',
+    why: "The final step! Twist each corner in-place using the trigger until its yellow sticker faces up. Don't panic if the cube looks scrambled mid-algorithm — it resolves.",
+    alg: ['R', 'U', "R'", "U'"],
+    algNote: 'Repeat per corner, then U to rotate the top layer.',
+    hold: 'Yellow face up. Work corner by corner at the front-right position.',
+  },
+];
+
+function AlgTokens({ moves }) {
+  const FACE_COLORS = { U: '#f5f5f5', D: '#f4d03f', F: '#27ae60', B: '#2980b9', R: '#e74c3c', L: '#e67e22' };
+  return (
+    <div className="alg-tokens">
+      {moves.map((m, i) => {
+        const face = m[0];
+        return (
+          <span
+            key={i}
+            className="alg-token"
+            style={{ '--face-color': FACE_COLORS[face] || '#aaa' }}
+          >
+            {m}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function LearnPage() {
-  return <div>Learn</div>;
+  return (
+    <div className="learn-page">
+      {/* Sidebar */}
+      <nav className="learn-sidebar">
+        <div className="learn-sidebar-title">Chapters</div>
+        {CHAPTERS.map((ch, i) => (
+          <a key={ch.id} href={`#${ch.id}`} className="learn-sidebar-link">
+            <span className="learn-sidebar-num">{i + 1}</span>
+            {ch.name}
+          </a>
+        ))}
+      </nav>
+
+      {/* Content */}
+      <main className="learn-content">
+        <header className="learn-header">
+          <h1>Beginner's Guide: Layer by Layer</h1>
+          <p>The most popular method to solve a Rubik's Cube — 7 steps, no memorisation required beyond a few simple algorithms.</p>
+        </header>
+
+        {CHAPTERS.map((ch, i) => (
+          <section key={ch.id} id={ch.id} className="learn-chapter">
+            <div className="chapter-label">Step {i + 1}</div>
+            <h2 className="chapter-name">{ch.name}</h2>
+            <div className="chapter-goal">Goal: {ch.goal}</div>
+
+            <p className="chapter-why">{ch.why}</p>
+
+            <div className="chapter-hold">
+              <span className="hold-label">Hold the cube:</span> {ch.hold}
+            </div>
+
+            {ch.alg ? (
+              <div className="chapter-alg">
+                <div className="alg-label">Algorithm</div>
+                <AlgTokens moves={ch.alg} />
+                <div className="alg-note">{ch.algNote}</div>
+              </div>
+            ) : (
+              <div className="chapter-alg">
+                <div className="alg-note">{ch.algNote}</div>
+              </div>
+            )}
+
+            <Link to="/solve" className="chapter-practice-link">
+              Practice in Solver →
+            </Link>
+          </section>
+        ))}
+      </main>
+    </div>
+  );
 }
