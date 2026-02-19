@@ -275,3 +275,49 @@
     align-items: center;
   }
 }
+
+/* ── Dual-algorithm panels (right insert / left insert) ── */
+.chapter-algs-duo {
+  display: flex;
+  gap: 1rem;
+}
+
+.chapter-alg-panel {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.alg-panel-direction {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.02em;
+}
+
+/* Center the cube within the panel */
+.chapter-alg-panel .chapter-cube {
+  align-self: center;
+  border-radius: 8px;
+}
+
+.alg-panel-caption {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  align-self: center;
+}
+
+@media (max-width: 700px) {
+  .chapter-algs-duo {
+    flex-direction: column;
+  }
+}

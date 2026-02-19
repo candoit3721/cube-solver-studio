@@ -29,8 +29,9 @@ describe('LearnPage', () => {
     });
   });
 
-  it('renders a ChapterCube for each of the 7 chapters', () => {
+  it('renders a ChapterCube for each chapter (7 goal-state + 2 insert-direction)', () => {
     render(<MemoryRouter><LearnPage /></MemoryRouter>);
-    expect(screen.getAllByTestId('chapter-cube')).toHaveLength(7);
+    // 7 chapters × 1 goal cube + 1 chapter (Middle Layer) × 2 insert-direction cubes = 9
+    expect(screen.getAllByTestId('chapter-cube')).toHaveLength(9);
   });
 });

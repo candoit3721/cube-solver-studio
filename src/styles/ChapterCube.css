@@ -1,6 +1,5 @@
 .chapter-cube {
-  width: 220px;
-  height: 220px;
+  /* width/height supplied by the size prop via inline style; default 220px */
   flex-shrink: 0;
   border-radius: 12px;
   overflow: hidden;

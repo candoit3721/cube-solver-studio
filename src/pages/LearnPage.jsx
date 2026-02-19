@@ -29,10 +29,22 @@ const CHAPTERS = [
     id: 'middle-layer',
     name: 'Middle Layer',
     goal: 'First two layers (F2L) complete',
-    why: 'Now solve the middle ring of edges. Each edge is inserted from the bottom layer using one of two mirror algorithms depending on which side it needs to go.',
-    alg: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
-    algNote: "Right insert (use mirror for left): U R U' R' U' F' U F",
+    why: 'Solve the middle ring of edges. Each edge piece drops in from the top layer using one of two mirror algorithms — choose based on which side the slot is on.',
     hold: 'White face up, solved layers at the bottom.',
+    algs: [
+      {
+        label: '→ Right insert',
+        moves: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
+        note: 'Edge goes into the front-right slot.',
+        stateIndex: 8,
+      },
+      {
+        label: '← Left insert',
+        moves: ["U'", "L'", 'U', 'L', 'U', 'F', "U'", "F'"],
+        note: 'Edge goes into the front-left slot.',
+        stateIndex: 9,
+      },
+    ],
   },
   {
     id: 'yellow-cross',
@@ -134,7 +146,19 @@ export default function LearnPage() {
                   <span className="hold-label">Hold the cube:</span> {ch.hold}
                 </div>
 
-                {ch.alg ? (
+                {ch.algs ? (
+                  <div className="chapter-algs-duo">
+                    {ch.algs.map((a, ai) => (
+                      <div key={ai} className="chapter-alg-panel">
+                        <div className="alg-panel-direction">{a.label}</div>
+                        <ChapterCube faceMap={CHAPTER_STATES[a.stateIndex]} size={160} />
+                        <p className="alg-panel-caption">target slot</p>
+                        <AlgTokens moves={a.moves} />
+                        <div className="alg-note">{a.note}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : ch.alg ? (
                   <div className="chapter-alg">
                     <div className="alg-label">Algorithm</div>
                     <AlgTokens moves={ch.alg} />

@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 import { createEngine } from '../engine/cubeEngine.js';
 import '../styles/ChapterCube.css';
 
-export default function ChapterCube({ faceMap }) {
+export default function ChapterCube({ faceMap, size = 220 }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -64,5 +64,5 @@ export default function ChapterCube({ faceMap }) {
     };
   }, [faceMap]);
 
-  return <div ref={containerRef} className="chapter-cube" />;
+  return <div ref={containerRef} className="chapter-cube" style={{ width: size, height: size }} />;
 }

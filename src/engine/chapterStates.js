@@ -79,4 +79,26 @@ export const CHAPTER_STATES = [
     L: ['L','L','L',  'L','L','L',  'L','L','L'],
     R: ['R','R','R',  'R','R','R',  'R','R','R'],
   },
+
+  // 8 — Right insert result: top layer solved, FR middle edge placed (idx F[5]=F, R[3]=R)
+  // Shows where the front-right slot is and what a correct right insert achieves.
+  {
+    U: ['U','U','U',  'U','U','U',  'U','U','U'],
+    D: ['F','R','L',  'B','D','R',  'L','F','B'],
+    F: ['F','F','F',  'L','F','F',  'D','R','B'],
+    R: ['R','R','R',  'R','R','B',  'F','D','L'],
+    L: ['L','L','L',  'B','L','R',  'B','D','F'],
+    B: ['B','B','B',  'F','B','L',  'R','D','L'],
+  },
+
+  // 9 — Left insert result: top layer solved, FL middle edge placed (idx F[3]=F, L[5]=L)
+  // Shows where the front-left slot is and what a correct left insert achieves.
+  {
+    U: ['U','U','U',  'U','U','U',  'U','U','U'],
+    D: ['F','L','R',  'B','D','L',  'R','F','B'],
+    F: ['F','F','F',  'F','F','R',  'D','L','B'],
+    R: ['R','R','R',  'B','R','L',  'F','D','F'],
+    L: ['L','L','L',  'B','L','L',  'F','D','R'],
+    B: ['B','B','B',  'R','B','F',  'L','D','L'],
+  },
 ];
