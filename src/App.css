@@ -19,7 +19,7 @@
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-html, body, #root {
+html, body {
   width: 100%; height: 100%;
   overflow: hidden;
   font-family: var(--font);
@@ -27,7 +27,11 @@ html, body, #root {
   background: var(--bg);
 }
 
+/* #root is the scroll container for content pages (Learn, Algorithms, Home).
+   SolvePage uses only absolute/fixed children so it never overflows. */
 #root {
+  width: 100%; height: 100%;
+  overflow-y: auto;
   position: relative;
 }
 
