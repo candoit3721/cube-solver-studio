@@ -39,7 +39,8 @@ export default function ChapterCube({ faceMap }) {
           if (!engine) {
             engine = createEngine(container);
             engine.createCube(faceMap);
-            // orbit.autoRotate is true by default; engine disables it on pointerdown
+            // Disable zoom so wheel events pass through to the page for scrolling
+            engine.orbit.enableZoom = false;
           }
           resume();
         } else {

@@ -11,4 +11,6 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
+  /* Allow vertical scroll to pass through on touch devices */
+  touch-action: pan-y;
 }
