@@ -37,12 +37,26 @@ const CHAPTERS = [
         moves: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
         note: 'Top sticker is red → belongs on the right face → front-right slot.',
         stateIndex: 7,
+        // Camera angled to show front + right + top faces clearly
+        cameraPosition: [5.5, 4.2, 5.5],
+        // Red arrow from the edge piece in the U layer down-right into the FR slot
+        arrows: [
+          { origin: [0.3, 1.5, 1.8], dir: [1, -1, 0], length: 2.1,
+            color: 0xe74c3c, headLength: 0.55, headWidth: 0.32 },
+        ],
       },
       {
         label: '← Left insert',
         moves: ["U'", "L'", 'U', 'L', 'U', 'F', "U'", "F'"],
         note: 'Top sticker is orange → belongs on the left face → front-left slot.',
         stateIndex: 8,
+        // Camera mirrored to show front + left + top faces clearly
+        cameraPosition: [-5.5, 4.2, 5.5],
+        // Orange arrow from the edge piece in the U layer down-left into the FL slot
+        arrows: [
+          { origin: [-0.3, 1.5, 1.8], dir: [-1, -1, 0], length: 2.1,
+            color: 0xe67e22, headLength: 0.55, headWidth: 0.32 },
+        ],
       },
     ],
   },
@@ -132,9 +146,9 @@ export default function LearnPage() {
             <div className="chapter-goal">Goal: {ch.goal}</div>
 
             <div className="chapter-body">
-              {/* Left: rotatable goal-state cube */}
+              {/* Left: rotatable goal-state cube (auto-rotates to show full cube) */}
               <div className="chapter-cube-col">
-                <ChapterCube faceMap={CHAPTER_STATES[i]} />
+                <ChapterCube faceMap={CHAPTER_STATES[i]} autoRotate={true} />
                 <p className="chapter-cube-caption">Goal state</p>
               </div>
 
