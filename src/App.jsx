@@ -34,7 +34,7 @@ function useBackendHealth() {
   return online;
 }
 
-function AppInner() {
+export function AppInner() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [freeScanOpen, setFreeScanOpen] = useState(false);

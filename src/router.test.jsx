@@ -5,6 +5,12 @@ import SolvePage from './pages/SolvePage.jsx';
 import LearnPage from './pages/LearnPage.jsx';
 import AlgorithmsPage from './pages/AlgorithmsPage.jsx';
 
+// SolvePage renders the Three.js solver which requires WebGL — mock it here.
+// Routing is what's under test, not the solver UI.
+vi.mock('./pages/SolvePage.jsx', () => ({
+  default: () => <div>Solver</div>,
+}));
+
 function AppRoutes({ initialEntry = '/' }) {
   return (
     <MemoryRouter initialEntries={[initialEntry]}>
