@@ -1,0 +1,205 @@
+/* ── CalibrationModal ── */
+.calibration-modal {
+    max-width: 440px;
+}
+
+/* ── Intro screen ── */
+.calib-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    text-align: center;
+}
+
+.calib-intro-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 340px;
+}
+
+.calib-intro-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* ── Progress dots ── */
+.calib-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.calib-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.calib-dot.done {
+    border-color: rgba(0, 200, 83, 0.5);
+    color: var(--green);
+}
+
+.calib-dot.active {
+    border-color: var(--accent);
+    color: var(--text);
+    transform: scale(1.15);
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.calib-dot-inner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.calib-dot .calib-dot-check {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    font-size: 10px;
+    color: var(--green);
+}
+
+/* ── Capture step ── */
+.calib-capture {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.calib-instruction {
+    font-size: 14px;
+    color: var(--text);
+    text-align: center;
+}
+
+.calib-instruction strong {
+    font-weight: 700;
+}
+
+.calib-video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+}
+
+.calib-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Circle overlay in center of video */
+.calib-circle-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.7);
+    pointer-events: none;
+    transition: border-color 0.2s ease;
+}
+
+.calib-circle-overlay.previewing {
+    border-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Live color preview inside the circle */
+.calib-preview-fill {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: background-color 0.15s ease;
+}
+
+/* ── Capture button ── */
+.calib-capture-btn {
+    min-width: 120px;
+}
+
+/* ── Review screen ── */
+.calib-review {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 0;
+}
+
+.calib-review-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.calib-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.calib-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.calib-swatch-color {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.calib-swatch-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.calib-swatch-rgb {
+    font-size: 10px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.calib-live-rgb {
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.calib-review-actions {
+    display: flex;
+    gap: 10px;
+}

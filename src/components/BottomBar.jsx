@@ -6,7 +6,7 @@ import { useCubeState } from '../hooks/useCubeState.jsx';
 import { isBusy } from '../engine/animator.js';
 import '../styles/BottomBar.css';
 
-export default function BottomBar({ onOpenEditor, onOpenCamera, onOpenNotation }) {
+export default function BottomBar({ onOpenEditor, onOpenCamera, onOpenFreeScan, onOpenNotation }) {
     const {
         state, scramble, solve, reset, speedRef, setMethod,
         stopPlaying, nextStep, prevStep, firstStep, lastStep,
@@ -100,6 +100,7 @@ export default function BottomBar({ onOpenEditor, onOpenCamera, onOpenNotation }
                 >Scramble</button>
 
                 <button className="btn btn-accent" onClick={onOpenCamera}>🖥 Scan</button>
+                <button className="btn btn-accent" onClick={onOpenFreeScan}>🔄 Free Scan</button>
                 <button className="btn btn-accent" onClick={onOpenEditor}>🎨 Edit</button>
 
                 <button

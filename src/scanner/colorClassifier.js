@@ -3,7 +3,12 @@
  *
  * Uses HSV-based classification with continuous hue coverage —
  * every chromatic pixel maps to exactly one color with zero gaps.
+ *
+ * When per-session calibration is active, classifyColor() delegates
+ * to nearest-neighbor RGB matching instead of the HSV thresholds.
  */
+
+import { isCalibrated, classifyCalibrated } from './colorCalibration.js';
 
 export const REFERENCE_COLORS = [
     { face: 'U', r: 255, g: 255, b: 255, label: 'White' },
@@ -54,6 +59,8 @@ export function rgbToHsv(r, g, b) {
  * Returns { face, confidence } where confidence is 0-1.
  */
 export function classifyColor(r, g, b) {
+    if (isCalibrated()) return classifyCalibrated(r, g, b);
+
     const { h, s, v } = rgbToHsv(r, g, b);
 
     // Very dark pixels — cube body or shadow

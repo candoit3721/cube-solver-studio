@@ -17,7 +17,13 @@
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_close",
       "WebSearch",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(ls:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:kociemba.org)",
+      "WebFetch(domain:cs231n.stanford.edu)",
+      "Bash(npx eslint:*)",
+      "Bash(git -C /Users/hwu/projects/claude-code-working-space/rubiks-cube diff --name-only HEAD)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 /**
  * App — main layout shell, wires all components together.
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { CubeProvider, useCubeState } from './hooks/useCubeState.jsx';
 import CubeCanvas from './components/CubeCanvas.jsx';
 import TopBar from './components/TopBar.jsx';
@@ -9,7 +9,10 @@ import BottomBar from './components/BottomBar.jsx';
 import SidePanel from './components/SidePanel.jsx';
 import EditorModal from './components/EditorModal.jsx';
 import CameraModal from './components/CameraModal.jsx';
+import FreeScanModal from './components/FreeScanModal.jsx';
+import CalibrationModal from './components/CalibrationModal.jsx';
 import NotationModal from './components/NotationModal.jsx';
+import { isCalibrated } from './scanner/colorCalibration.js';
 import { checkHealth } from './api/cubeApi.js';
 import './App.css';
 
@@ -34,9 +37,29 @@ function useBackendHealth() {
 function AppInner() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [freeScanOpen, setFreeScanOpen] = useState(false);
   const [notationOpen, setNotationOpen] = useState(false);
+  const [calibrationOpen, setCalibrationOpen] = useState(false);
+  const [pendingScanMode, setPendingScanMode] = useState(null); // 'scan' | 'freeScan' | null
   const [panelOpen, setPanelOpen] = useState(false);
   const backendOnline = useBackendHealth();
+
+  const openWithCalibrationGate = useCallback((mode) => {
+    if (isCalibrated()) {
+      if (mode === 'scan') setCameraOpen(true);
+      else setFreeScanOpen(true);
+    } else {
+      setPendingScanMode(mode);
+      setCalibrationOpen(true);
+    }
+  }, []);
+
+  const handleCalibrationComplete = useCallback((/* didCalibrate */) => {
+    setCalibrationOpen(false);
+    if (pendingScanMode === 'scan') setCameraOpen(true);
+    else if (pendingScanMode === 'freeScan') setFreeScanOpen(true);
+    setPendingScanMode(null);
+  }, [pendingScanMode]);
 
   const { state, scramble, solve, stopPlaying, nextStep, prevStep, firstStep, lastStep, reset } = useCubeState();
 
@@ -52,7 +75,7 @@ function AppInner() {
     const handler = (e) => {
       if (e.repeat) return;
       // Don't capture keys when a modal is open
-      if (editorOpen || cameraOpen || notationOpen) return;
+      if (editorOpen || cameraOpen || freeScanOpen || calibrationOpen || notationOpen) return;
 
       switch (e.key) {
         case 's': case 'S': scramble(); break;
@@ -72,7 +95,7 @@ function AppInner() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [editorOpen, cameraOpen, notationOpen, state, scramble, solve, stopPlaying, nextStep, prevStep, firstStep, lastStep, reset]);
+  }, [editorOpen, cameraOpen, freeScanOpen, calibrationOpen, notationOpen, state, scramble, solve, stopPlaying, nextStep, prevStep, firstStep, lastStep, reset]);
 
   return (
     <>
@@ -83,12 +106,19 @@ function AppInner() {
       <TopBar />
       <BottomBar
         onOpenEditor={() => setEditorOpen(true)}
-        onOpenCamera={() => setCameraOpen(true)}
+        onOpenCamera={() => openWithCalibrationGate('scan')}
+        onOpenFreeScan={() => openWithCalibrationGate('freeScan')}
         onOpenNotation={() => setNotationOpen(true)}
       />
       <SidePanel open={panelOpen} onToggle={() => setPanelOpen(p => !p)} />
       <EditorModal open={editorOpen} onClose={() => setEditorOpen(false)} />
+      <CalibrationModal
+        isOpen={calibrationOpen}
+        onClose={() => { setCalibrationOpen(false); setPendingScanMode(null); }}
+        onComplete={handleCalibrationComplete}
+      />
       <CameraModal open={cameraOpen} onClose={() => setCameraOpen(false)} />
+      <FreeScanModal open={freeScanOpen} onClose={() => setFreeScanOpen(false)} />
       <NotationModal open={notationOpen} onClose={() => setNotationOpen(false)} />
     </>
   );
