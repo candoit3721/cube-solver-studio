@@ -225,3 +225,53 @@
     padding: 1.5rem 1.25rem;
   }
 }
+
+/* ── Chapter two-column body (cube + text) ── */
+.chapter-body {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-top: 0.5rem;
+}
+
+.chapter-cube-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.chapter-cube-caption {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.chapter-text-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Override the default max-width on why text inside the col */
+.chapter-text-col .chapter-why {
+  max-width: none;
+  margin: 0;
+}
+
+.chapter-text-col .chapter-hold {
+  margin-bottom: 0;
+}
+
+/* Mobile: stack cube above text */
+@media (max-width: 700px) {
+  .chapter-body {
+    flex-direction: column;
+    align-items: center;
+  }
+}

@@ -3,6 +3,8 @@
  */
 import { Link } from 'react-router-dom';
 import '../styles/LearnPage.css';
+import ChapterCube from '../components/ChapterCube.jsx';
+import { CHAPTER_STATES } from '../engine/chapterStates.js';
 
 const CHAPTERS = [
   {
@@ -117,27 +119,38 @@ export default function LearnPage() {
             <h2 className="chapter-name">{ch.name}</h2>
             <div className="chapter-goal">Goal: {ch.goal}</div>
 
-            <p className="chapter-why">{ch.why}</p>
+            <div className="chapter-body">
+              {/* Left: rotatable goal-state cube */}
+              <div className="chapter-cube-col">
+                <ChapterCube faceMap={CHAPTER_STATES[i]} />
+                <p className="chapter-cube-caption">Goal state</p>
+              </div>
 
-            <div className="chapter-hold">
-              <span className="hold-label">Hold the cube:</span> {ch.hold}
+              {/* Right: explanation + algorithm + practice link */}
+              <div className="chapter-text-col">
+                <p className="chapter-why">{ch.why}</p>
+
+                <div className="chapter-hold">
+                  <span className="hold-label">Hold the cube:</span> {ch.hold}
+                </div>
+
+                {ch.alg ? (
+                  <div className="chapter-alg">
+                    <div className="alg-label">Algorithm</div>
+                    <AlgTokens moves={ch.alg} />
+                    <div className="alg-note">{ch.algNote}</div>
+                  </div>
+                ) : (
+                  <div className="chapter-alg">
+                    <div className="alg-note">{ch.algNote}</div>
+                  </div>
+                )}
+
+                <Link to="/solve" className="chapter-practice-link">
+                  Practice in Solver →
+                </Link>
+              </div>
             </div>
-
-            {ch.alg ? (
-              <div className="chapter-alg">
-                <div className="alg-label">Algorithm</div>
-                <AlgTokens moves={ch.alg} />
-                <div className="alg-note">{ch.algNote}</div>
-              </div>
-            ) : (
-              <div className="chapter-alg">
-                <div className="alg-note">{ch.algNote}</div>
-              </div>
-            )}
-
-            <Link to="/solve" className="chapter-practice-link">
-              Practice in Solver →
-            </Link>
           </section>
         ))}
       </main>

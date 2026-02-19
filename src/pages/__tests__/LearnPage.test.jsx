@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import LearnPage from '../LearnPage.jsx';
+
+vi.mock('../../components/ChapterCube.jsx', () => ({
+  default: () => <div data-testid="chapter-cube" />,
+}));
 
 describe('LearnPage', () => {
   it('renders all 7 chapter headings', () => {
@@ -22,5 +27,10 @@ describe('LearnPage', () => {
     practiceLinks.forEach(link => {
       expect(link).toHaveAttribute('href', '/solve');
     });
+  });
+
+  it('renders a ChapterCube for each of the 7 chapters', () => {
+    render(<MemoryRouter><LearnPage /></MemoryRouter>);
+    expect(screen.getAllByTestId('chapter-cube')).toHaveLength(7);
   });
 });
