@@ -29,20 +29,20 @@ const CHAPTERS = [
     id: 'middle-layer',
     name: 'Middle Layer',
     goal: 'First two layers (F2L) complete',
-    why: 'Solve the middle ring of edges. Each edge piece drops in from the top layer using one of two mirror algorithms — choose based on which side the slot is on.',
+    why: 'Solve the 4 middle-layer edges one at a time. Hold the cube so the edge\'s front colour matches the front centre. The sticker on top of the U layer tells you which algorithm to use: if it\'s red it goes right, if it\'s orange it goes left.',
     hold: 'White face up, solved layers at the bottom.',
     algs: [
       {
         label: '→ Right insert',
         moves: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
-        note: 'Edge goes into the front-right slot.',
-        stateIndex: 8,
+        note: 'Top sticker is red → belongs on the right face → front-right slot.',
+        stateIndex: 7,
       },
       {
         label: '← Left insert',
         moves: ["U'", "L'", 'U', 'L', 'U', 'F', "U'", "F'"],
-        note: 'Edge goes into the front-left slot.',
-        stateIndex: 9,
+        note: 'Top sticker is orange → belongs on the left face → front-left slot.',
+        stateIndex: 8,
       },
     ],
   },
@@ -152,7 +152,7 @@ export default function LearnPage() {
                       <div key={ai} className="chapter-alg-panel">
                         <div className="alg-panel-direction">{a.label}</div>
                         <ChapterCube faceMap={CHAPTER_STATES[a.stateIndex]} size={160} />
-                        <p className="alg-panel-caption">target slot</p>
+                        <p className="alg-panel-caption">edge ready in top layer</p>
                         <AlgTokens moves={a.moves} />
                         <div className="alg-note">{a.note}</div>
                       </div>

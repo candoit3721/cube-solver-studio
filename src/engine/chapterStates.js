@@ -80,25 +80,29 @@ export const CHAPTER_STATES = [
     R: ['R','R','R',  'R','R','R',  'R','R','R'],
   },
 
-  // 8 — Right insert result: top layer solved, FR middle edge placed (idx F[5]=F, R[3]=R)
-  // Shows where the front-right slot is and what a correct right insert achieves.
+  // 7 — Right insert SETUP: edge piece in U layer at UF position, ready for right insert.
+  // U[7]=R  → red sticker on top = "this colour goes to the Right face"
+  // F[1]=F  → green sticker faces front = matches front centre
+  // FL slot already done (F[3]=F, L[5]=L); FR slot empty (F[5]=B, R[3]=D).
   {
-    U: ['U','U','U',  'U','U','U',  'U','U','U'],
-    D: ['F','R','L',  'B','D','R',  'L','F','B'],
-    F: ['F','F','F',  'L','F','F',  'D','R','B'],
-    R: ['R','R','R',  'R','R','B',  'F','D','L'],
-    L: ['L','L','L',  'B','L','R',  'B','D','F'],
-    B: ['B','B','B',  'F','B','L',  'R','D','L'],
+    U: ['U','U','U',  'U','U','U',  'U','R','U'],
+    D: ['F','L','R',  'B','D','F',  'R','L','B'],
+    F: ['F','F','F',  'F','F','B',  'D','R','L'],
+    R: ['R','R','R',  'D','R','L',  'F','B','D'],
+    L: ['L','L','L',  'B','L','L',  'R','F','D'],
+    B: ['B','B','B',  'R','B','F',  'L','D','R'],
   },
 
-  // 9 — Left insert result: top layer solved, FL middle edge placed (idx F[3]=F, L[5]=L)
-  // Shows where the front-left slot is and what a correct left insert achieves.
+  // 8 — Left insert SETUP: same edge-in-U-layer setup but for the left slot.
+  // U[7]=L  → orange sticker on top = "this colour goes to the Left face"
+  // F[1]=F  → green sticker faces front = matches front centre
+  // FR slot already done (F[5]=F, R[3]=R); FL slot empty (F[3]=B, L[5]=R).
   {
-    U: ['U','U','U',  'U','U','U',  'U','U','U'],
-    D: ['F','L','R',  'B','D','L',  'R','F','B'],
-    F: ['F','F','F',  'F','F','R',  'D','L','B'],
-    R: ['R','R','R',  'B','R','L',  'F','D','F'],
-    L: ['L','L','L',  'B','L','L',  'F','D','R'],
-    B: ['B','B','B',  'R','B','F',  'L','D','L'],
+    U: ['U','U','U',  'U','U','U',  'U','L','U'],
+    D: ['F','R','L',  'B','D','F',  'L','R','B'],
+    F: ['F','F','F',  'B','F','F',  'D','L','R'],
+    R: ['R','R','R',  'R','R','B',  'F','D','L'],
+    L: ['L','L','L',  'D','L','R',  'B','F','D'],
+    B: ['B','B','B',  'F','B','L',  'R','D','F'],
   },
 ];
