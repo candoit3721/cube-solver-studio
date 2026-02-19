@@ -1879,6 +1879,442 @@ git commit -m "feat: add AlgorithmsPage with notation guide and LBL reference"
 | 4 | SolvePage (existing app) | `SolvePage.jsx`, `App.jsx` export |
 | 5 | Home landing page | `Home.jsx`, `HeroCube.jsx`, `Home.css`, test |
 | 6 | LearnPage (7 LBL chapters) | `LearnPage.jsx`, `LearnPage.css`, test |
+| 6a | ChapterCube (rotatable per-phase cube) | `ChapterCube.jsx`, `ChapterCube.css`, `chapterStates.js`, test |
 | 7 | AlgorithmsPage (notation + algs) | `AlgorithmsPage.jsx`, `AlgorithmsPage.css`, test |
 
-Total new files: ~16 files. Zero changes to any existing engine, solver, scanner, or modal code.
+Total new files: ~19 files. Zero changes to any existing engine, solver, scanner, or modal code.
+
+---
+
+## Amendment: ChapterCube — Interactive Phase Visualization for LearnPage
+
+**Added after:** original plan.
+**Why:** Each Learn chapter benefits from a small rotatable 3D cube showing the *goal state* for that phase — giving learners an immediate visual reference before reading the text.
+
+### Design decisions
+
+- **Static goal-state cube** (not animated algorithm playback). Each chapter shows what the cube looks like *after* that phase is complete.
+- **User-controlled rotation** (`autoRotate = false`). Learners drag to inspect the cube.
+- **Standalone component** (no `CubeProvider`). Calls `createEngine()` directly, same pattern as `HeroCube`.
+- **IntersectionObserver lazy init**: Three.js engine boots only when the section scrolls into view. When it scrolls back out, the animation loop pauses. This avoids running 7 WebGL renderers simultaneously.
+- **Size**: ~220×220 px.
+
+---
+
+## Task 6a: ChapterCube component
+
+**Execute this task between Task 5 and Task 6.**
+
+**Files:**
+- Create: `src/components/ChapterCube.jsx`
+- Create: `src/styles/ChapterCube.css`
+- Create: `src/engine/chapterStates.js`
+- Create: `src/components/__tests__/ChapterCube.test.jsx`
+
+---
+
+### Step 1: Create chapterStates.js
+
+Create `src/engine/chapterStates.js`:
+
+```js
+// Goal-state face maps for each LBL phase.
+// Each entry is a faceMap object passed to createEngine's createCube().
+// Face keys: U (top), D (bottom), F (front), B (back), L (left), R (right)
+// Each face: 9 stickers in row-major order, viewed from outside the cube.
+// Colors: W=white, Y=yellow, G=green, B=blue, O=orange, R=red
+
+export const CHAPTER_STATES = [
+  // Chapter 1 — White Cross
+  // White cross on top (U), matching edge stickers on side faces.
+  {
+    U: ['G','W','B',  'W','W','W',  'O','W','R'],
+    D: ['G','O','R',  'B','Y','G',  'O','R','B'],
+    F: ['R','G','Y',  'G','G','G',  'O','B','Y'],
+    B: ['O','B','Y',  'B','B','B',  'R','G','Y'],
+    L: ['B','O','R',  'O','O','O',  'Y','G','Y'],
+    R: ['Y','R','G',  'R','R','R',  'B','Y','B'],
+  },
+
+  // Chapter 2 — White Corners
+  // Entire top face white; top row of every side face matches its center.
+  {
+    U: ['W','W','W',  'W','W','W',  'W','W','W'],
+    D: ['B','G','O',  'R','Y','B',  'G','O','R'],
+    F: ['G','G','G',  'O','G','R',  'Y','B','Y'],
+    B: ['B','B','B',  'G','B','O',  'R','Y','G'],
+    L: ['O','O','O',  'B','O','G',  'Y','R','Y'],
+    R: ['R','R','R',  'Y','R','B',  'G','Y','O'],
+  },
+
+  // Chapter 3 — Middle Layer
+  // Top two layers fully solved; only the bottom layer remains.
+  {
+    U: ['W','W','W',  'W','W','W',  'W','W','W'],
+    D: ['O','B','G',  'R','Y','O',  'B','G','R'],
+    F: ['G','G','G',  'G','G','G',  'Y','B','O'],
+    B: ['B','B','B',  'B','B','B',  'R','G','Y'],
+    L: ['O','O','O',  'O','O','O',  'G','Y','R'],
+    R: ['R','R','R',  'R','R','R',  'B','Y','G'],
+  },
+
+  // Chapter 4 — Yellow Cross
+  // Middle layers solved + yellow cross on bottom face.
+  {
+    U: ['W','W','W',  'W','W','W',  'W','W','W'],
+    D: ['O','Y','G',  'Y','Y','Y',  'B','Y','R'],
+    F: ['G','G','G',  'G','G','G',  'O','Y','R'],
+    B: ['B','B','B',  'B','B','B',  'G','Y','O'],
+    L: ['O','O','O',  'O','O','O',  'B','Y','R'],
+    R: ['R','R','R',  'R','R','R',  'G','Y','B'],
+  },
+
+  // Chapter 5 — Yellow Edge Permutation
+  // Yellow cross with all four edge stickers aligned to their side centers.
+  {
+    U: ['W','W','W',  'W','W','W',  'W','W','W'],
+    D: ['O','Y','R',  'Y','Y','Y',  'G','Y','B'],
+    F: ['G','G','G',  'G','G','G',  'O','G','R'],
+    B: ['B','B','B',  'B','B','B',  'O','B','R'],
+    L: ['O','O','O',  'O','O','O',  'G','O','B'],
+    R: ['R','R','R',  'R','R','R',  'B','R','G'],
+  },
+
+  // Chapter 6 — Yellow Corner Permutation
+  // Corners moved to correct slots; two corners still twisted (showing Y on sides).
+  {
+    U: ['W','W','W',  'W','W','W',  'W','W','W'],
+    D: ['G','Y','Y',  'Y','Y','Y',  'Y','Y','B'],
+    F: ['G','G','G',  'G','G','G',  'Y','G','G'],
+    B: ['B','B','B',  'B','B','B',  'B','B','Y'],
+    L: ['O','O','O',  'O','O','O',  'O','O','G'],
+    R: ['R','R','R',  'R','R','R',  'B','R','R'],
+  },
+
+  // Chapter 7 — Solved!
+  {
+    U: ['W','W','W',  'W','W','W',  'W','W','W'],
+    D: ['Y','Y','Y',  'Y','Y','Y',  'Y','Y','Y'],
+    F: ['G','G','G',  'G','G','G',  'G','G','G'],
+    B: ['B','B','B',  'B','B','B',  'B','B','B'],
+    L: ['O','O','O',  'O','O','O',  'O','O','O'],
+    R: ['R','R','R',  'R','R','R',  'R','R','R'],
+  },
+];
+```
+
+### Step 2: Write the failing test
+
+Create `src/components/__tests__/ChapterCube.test.jsx`:
+
+```jsx
+import { render } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import ChapterCube from '../ChapterCube';
+import { CHAPTER_STATES } from '../../engine/chapterStates';
+
+vi.mock('../../engine/cubeEngine', () => ({
+  createEngine: vi.fn(() => ({
+    createCube: vi.fn(),
+    render: vi.fn(),
+    resize: vi.fn(),
+    dispose: vi.fn(),
+    orbit: { autoRotate: false },
+    renderer: { setAnimationLoop: vi.fn() },
+  })),
+}));
+
+describe('ChapterCube', () => {
+  it('renders a canvas container div', () => {
+    const { container } = render(
+      <ChapterCube faceMap={CHAPTER_STATES[0]} />
+    );
+    expect(container.querySelector('.chapter-cube')).not.toBeNull();
+  });
+
+  it('renders without crashing for all 7 phase states', () => {
+    CHAPTER_STATES.forEach((faceMap, i) => {
+      expect(() =>
+        render(<ChapterCube faceMap={faceMap} />)
+      ).not.toThrow();
+    });
+  });
+
+  it('exports CHAPTER_STATES with 7 entries', () => {
+    expect(CHAPTER_STATES).toHaveLength(7);
+  });
+});
+```
+
+### Step 3: Run test to verify it fails
+
+```bash
+npm run test:run -- src/components/__tests__/ChapterCube.test.jsx
+```
+Expected: FAIL — `ChapterCube` module not found.
+
+### Step 4: Create ChapterCube.jsx
+
+Create `src/components/ChapterCube.jsx`:
+
+```jsx
+import { useEffect, useRef } from 'react';
+import { createEngine } from '../engine/cubeEngine';
+import '../styles/ChapterCube.css';
+
+export default function ChapterCube({ faceMap }) {
+  const containerRef = useRef(null);
+  const engineRef = useRef(null);
+  const frameRef = useRef(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let disposed = false;
+
+    const boot = () => {
+      if (disposed || engineRef.current) return;
+      const engine = createEngine(container);
+      engine.createCube(faceMap);
+      engine.orbit.autoRotate = false;
+      engineRef.current = engine;
+
+      const loop = () => {
+        if (disposed) return;
+        engine.render();
+        frameRef.current = requestAnimationFrame(loop);
+      };
+      frameRef.current = requestAnimationFrame(loop);
+    };
+
+    const pause = () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+
+    const resume = () => {
+      if (!engineRef.current || frameRef.current) return;
+      const engine = engineRef.current;
+      const loop = () => {
+        if (disposed) return;
+        engine.render();
+        frameRef.current = requestAnimationFrame(loop);
+      };
+      frameRef.current = requestAnimationFrame(loop);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!engineRef.current) boot();
+          else resume();
+        } else {
+          pause();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+
+    const handleResize = () => engineRef.current?.resize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      disposed = true;
+      pause();
+      observer.disconnect();
+      window.removeEventListener('resize', handleResize);
+      engineRef.current?.dispose();
+      engineRef.current = null;
+    };
+  }, [faceMap]);
+
+  return <div ref={containerRef} className="chapter-cube" />;
+}
+```
+
+### Step 5: Create ChapterCube.css
+
+Create `src/styles/ChapterCube.css`:
+
+```css
+.chapter-cube {
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0a0a14;
+}
+
+.chapter-cube canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+```
+
+### Step 6: Run tests to verify they pass
+
+```bash
+npm run test:run -- src/components/__tests__/ChapterCube.test.jsx
+```
+Expected: All 3 tests PASS.
+
+### Step 7: Commit
+
+```bash
+git add src/components/ChapterCube.jsx src/styles/ChapterCube.css \
+        src/engine/chapterStates.js \
+        src/components/__tests__/ChapterCube.test.jsx
+git commit -m "feat: add ChapterCube component with 7 LBL phase goal states"
+```
+
+---
+
+## Task 6 (amended): LearnPage with ChapterCube
+
+**Replace the Task 6 chapter content structure** with this updated version. The two-column page layout and sidebar are unchanged. Each chapter section now includes a `ChapterCube` alongside the text.
+
+### Updated import list for LearnPage.jsx
+
+```jsx
+import ChapterCube from '../components/ChapterCube';
+import { CHAPTER_STATES } from '../engine/chapterStates';
+```
+
+### Updated chapter data structure
+
+The `CHAPTERS` array in `LearnPage.jsx` gains a `stateIndex` field referencing `CHAPTER_STATES`:
+
+```jsx
+const CHAPTERS = [
+  {
+    id: 'white-cross',
+    title: 'Step 1: White Cross',
+    goal: 'Form a white cross on the top face with matching edge colours.',
+    why: PHASE_INFO[0].why,
+    alg: PHASE_INFO[0].alg,
+    hold: 'Hold the cube with the white centre on top.',
+    stateIndex: 0,
+  },
+  // … repeat for steps 2–7, stateIndex: 1–6
+];
+```
+
+### Updated chapter section JSX
+
+Replace the single-column chapter block with a two-column layout:
+
+```jsx
+{CHAPTERS.map((ch, i) => (
+  <section key={ch.id} id={ch.id} className="learn-chapter">
+    <h2 className="chapter-title">{ch.title}</h2>
+    <p className="chapter-goal">{ch.goal}</p>
+
+    <div className="chapter-body">
+      {/* Left: rotatable goal-state cube */}
+      <div className="chapter-cube-col">
+        <ChapterCube faceMap={CHAPTER_STATES[ch.stateIndex]} />
+        <p className="chapter-cube-caption">Goal state</p>
+      </div>
+
+      {/* Right: text content */}
+      <div className="chapter-text-col">
+        <p className="chapter-why">{ch.why}</p>
+
+        {ch.alg && (
+          <div className="chapter-alg">
+            <span className="alg-label">Algorithm</span>
+            <div className="alg-tokens">
+              {ch.alg.split(' ').map((move, j) => (
+                <span key={j} className={`move-token move-${move[0].toLowerCase()}`}>
+                  {move}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <p className="chapter-hold">{ch.hold}</p>
+
+        <Link to="/solve" className="chapter-practice-link">
+          Practice in Solver →
+        </Link>
+      </div>
+    </div>
+  </section>
+))}
+```
+
+### Additional CSS for LearnPage.css
+
+Append these rules to `LearnPage.css` (the existing rules from Task 6 remain unchanged):
+
+```css
+/* Two-column chapter body */
+.chapter-body {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-top: 1.25rem;
+}
+
+.chapter-cube-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chapter-cube-caption {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.35);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chapter-text-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Mobile: stack cube above text */
+@media (max-width: 600px) {
+  .chapter-body {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+```
+
+### Updated test for LearnPage
+
+Add one additional test case to `src/pages/__tests__/LearnPage.test.jsx`:
+
+```jsx
+vi.mock('../../components/ChapterCube', () => ({
+  default: ({ faceMap }) => <div data-testid="chapter-cube" />,
+}));
+
+it('renders a ChapterCube for each of the 7 chapters', () => {
+  render(<MemoryRouter><LearnPage /></MemoryRouter>);
+  expect(screen.getAllByTestId('chapter-cube')).toHaveLength(7);
+});
+```
+
+### Step N+1: Commit
+
+```bash
+git add src/pages/LearnPage.jsx src/styles/LearnPage.css \
+        src/pages/__tests__/LearnPage.test.jsx
+git commit -m "feat: integrate ChapterCube into LearnPage for per-phase visualization"
+```
