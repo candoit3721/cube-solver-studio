@@ -1,10 +1,13 @@
 /**
  * LearnPage — 7-chapter beginner Layer-by-Layer guide.
  */
+import { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/LearnPage.css';
 import ChapterCube from '../components/ChapterCube.jsx';
+import AlgTooltipCube from '../components/AlgTooltipCube.jsx';
 import { CHAPTER_STATES } from '../engine/chapterStates.js';
+import { faceMapToState, stateToFaceMap, applyMove } from '../engine/cubeState.js';
 
 const CHAPTERS = [
   {
@@ -24,6 +27,7 @@ const CHAPTERS = [
     alg: ["R'", "D'", 'R', 'D'],
     algNote: 'Repeat the trigger until the corner is oriented correctly.',
     hold: 'White face up.',
+    startFaceMap: CHAPTER_STATES[0],
   },
   {
     id: 'middle-layer',
@@ -37,6 +41,7 @@ const CHAPTERS = [
         moves: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
         note: 'Top sticker is red → belongs on the right face → front-right slot.',
         stateIndex: 7,
+        startFaceMap: CHAPTER_STATES[7],
         // Camera angled to show front + right + top faces clearly
         cameraPosition: [5.5, 4.2, 5.5],
         // Red arrow from the edge piece in the U layer down-right into the FR slot
@@ -50,6 +55,7 @@ const CHAPTERS = [
         moves: ["U'", "L'", 'U', 'L', 'U', 'F', "U'", "F'"],
         note: 'Top sticker is orange → belongs on the left face → front-left slot.',
         stateIndex: 8,
+        startFaceMap: CHAPTER_STATES[8],
         // Camera mirrored to show front + left + top faces clearly
         cameraPosition: [-5.5, 4.2, 5.5],
         // Orange arrow from the edge piece in the U layer down-left into the FL slot
@@ -68,6 +74,7 @@ const CHAPTERS = [
     alg: ['F', 'R', 'U', "R'", "U'", "F'"],
     algNote: 'Apply 1–3 times depending on starting shape.',
     hold: 'Yellow face up.',
+    startFaceMap: CHAPTER_STATES[2],
   },
   {
     id: 'yellow-edge-perm',
@@ -77,6 +84,7 @@ const CHAPTERS = [
     alg: ['R', 'U', "R'", 'U', 'R', 'U2', "R'"],
     algNote: 'Applies a 3-cycle of the top edges.',
     hold: 'Yellow face up. Find a solved edge and keep it in the back.',
+    startFaceMap: CHAPTER_STATES[3],
   },
   {
     id: 'yellow-corner-perm',
@@ -86,6 +94,7 @@ const CHAPTERS = [
     alg: ['U', 'R', "U'", "L'", 'U', "R'", "U'", 'L'],
     algNote: '3-corner cycle. Repeat as needed.',
     hold: 'Yellow face up.',
+    startFaceMap: CHAPTER_STATES[4],
   },
   {
     id: 'yellow-corner-orient',
@@ -95,25 +104,64 @@ const CHAPTERS = [
     alg: ["R'", "D'", 'R', 'D'],
     algNote: "Apply 2× (yellow sticker faces right) or 4× (yellow sticker faces front) per corner. Then use U or U' — not a whole-cube rotation — to bring the next incorrect corner to the front-right-top position. Repeat until all yellow stickers face up.",
     hold: 'Yellow face up. Work corner by corner at the front-right position.',
+    startFaceMap: CHAPTER_STATES[5],
   },
 ];
 
-function AlgTokens({ moves }) {
+function AlgTokens({ moves, startFaceMap }) {
   const FACE_COLORS = { U: '#f5f5f5', D: '#f4d03f', F: '#27ae60', B: '#2980b9', R: '#e74c3c', L: '#e67e22' };
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [tooltipLeft, setTooltipLeft] = useState(0);
+  const containerRef = useRef(null);
+
+  // Precompute the cube state after each move in the sequence
+  const intermediateStates = useMemo(() => {
+    if (!startFaceMap) return null;
+    const start = faceMapToState(startFaceMap);
+    const states = [];
+    let current = start;
+    for (const move of moves) {
+      current = applyMove(current, move);
+      states.push(stateToFaceMap(current));
+    }
+    return states;
+  }, [startFaceMap, moves]);
+
   return (
-    <div className="alg-tokens">
-      {moves.map((m, i) => {
-        const face = m[0];
-        return (
-          <span
-            key={i}
-            className="alg-token"
-            style={{ '--face-color': FACE_COLORS[face] || '#aaa' }}
-          >
-            {m}
-          </span>
-        );
-      })}
+    <div ref={containerRef} className="alg-tokens">
+      {moves.map((m, i) => (
+        <span
+          key={i}
+          className={`alg-token${intermediateStates ? ' alg-token--hoverable' : ''}`}
+          style={{ '--face-color': FACE_COLORS[m[0]] || '#aaa' }}
+          onMouseEnter={(e) => {
+            if (!intermediateStates) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const containerRect = containerRef.current.getBoundingClientRect();
+            setTooltipLeft(rect.left - containerRect.left + rect.width / 2);
+            setHoveredIdx(i);
+          }}
+          onMouseLeave={() => setHoveredIdx(null)}
+        >
+          {m}
+        </span>
+      ))}
+
+      {/* Single persistent tooltip cube — always mounted so the engine isn't recreated on each hover */}
+      {intermediateStates && (
+        <div
+          className={`alg-token-tooltip${hoveredIdx !== null ? ' alg-token-tooltip--visible' : ''}`}
+          style={{ left: tooltipLeft }}
+        >
+          <AlgTooltipCube
+            faceMap={hoveredIdx !== null ? intermediateStates[hoveredIdx] : intermediateStates[0]}
+            size={140}
+          />
+          <p className="alg-token-tooltip-label">
+            {hoveredIdx !== null ? moves.slice(0, hoveredIdx + 1).join(' ') : ''}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -167,7 +215,7 @@ export default function LearnPage() {
                         <div className="alg-panel-direction">{a.label}</div>
                         <ChapterCube faceMap={CHAPTER_STATES[a.stateIndex]} size={160} cameraPosition={a.cameraPosition} />
                         <p className="alg-panel-caption">edge ready in top layer</p>
-                        <AlgTokens moves={a.moves} />
+                        <AlgTokens moves={a.moves} startFaceMap={a.startFaceMap} />
                         <div className="alg-note">{a.note}</div>
                       </div>
                     ))}
@@ -175,7 +223,7 @@ export default function LearnPage() {
                 ) : ch.alg ? (
                   <div className="chapter-alg">
                     <div className="alg-label">Algorithm</div>
-                    <AlgTokens moves={ch.alg} />
+                    <AlgTokens moves={ch.alg} startFaceMap={ch.startFaceMap} />
                     <div className="alg-note">{ch.algNote}</div>
                   </div>
                 ) : (

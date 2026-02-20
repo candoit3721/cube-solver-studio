@@ -153,6 +153,16 @@ export function stateToString(state) {
   return state.join('');
 }
 
+/** Convert state array back to faceMap (editor format) */
+export function stateToFaceMap(state) {
+  const faceMap = {};
+  for (const face of FACE_ORDER) {
+    const off = FACE_OFFSET[face];
+    faceMap[face] = state.slice(off, off + 9);
+  }
+  return faceMap;
+}
+
 /** Convert faceMap (editor format) to state array */
 export function faceMapToState(faceMap) {
   const state = new Array(54);

@@ -7,6 +7,10 @@ vi.mock('../../components/ChapterCube.jsx', () => ({
   default: () => <div data-testid="chapter-cube" />,
 }));
 
+vi.mock('../../components/AlgTooltipCube.jsx', () => ({
+  default: () => <div data-testid="alg-tooltip-cube" />,
+}));
+
 describe('LearnPage', () => {
   it('renders all 7 chapter headings', () => {
     render(<MemoryRouter><LearnPage /></MemoryRouter>);
