@@ -1,16 +1,15 @@
 /**
  * AlgTooltipCube — static, non-interactive 3D cube for algorithm token tooltips.
- * Creates ONE engine on mount; updates cube colours via createCube() on faceMap changes.
- * No orbit rotation, no zoom, no auto-rotation.
+ * Creates the engine and cube on mount; disposes on unmount.
+ * Designed to be conditionally rendered (only while hovered) to keep
+ * total WebGL context count within browser limits.
  */
 import { useEffect, useRef } from 'react';
 import { createEngine } from '../engine/cubeEngine.js';
 
-export default function AlgTooltipCube({ faceMap, size = 140 }) {
+export default function AlgTooltipCube({ faceMap, size = 110 }) {
   const containerRef = useRef(null);
-  const engineRef = useRef(null);
 
-  // Create the engine once on mount
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -19,7 +18,7 @@ export default function AlgTooltipCube({ faceMap, size = 140 }) {
     engine.orbit.enableRotate = false;
     engine.orbit.enableZoom = false;
     engine.orbit.autoRotate = false;
-    engineRef.current = engine;
+    engine.createCube(faceMap); // faceMap is fixed at mount; changes handled by remounting
 
     let disposed = false;
     let animId = null;
@@ -38,15 +37,9 @@ export default function AlgTooltipCube({ faceMap, size = 140 }) {
       if (animId) cancelAnimationFrame(animId);
       window.removeEventListener('resize', onResize);
       engine.dispose();
-      engineRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Update cube colours without recreating the engine
-  useEffect(() => {
-    engineRef.current?.createCube(faceMap);
-  }, [faceMap]);
+  }, []); // intentionally ignores faceMap — it's stable for the lifetime of this mount
 
   return (
     <div

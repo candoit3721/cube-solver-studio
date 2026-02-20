@@ -187,7 +187,7 @@
   transform: translateY(-2px);
 }
 
-/* Glass tooltip shown above hovered token */
+/* Glass tooltip shown above hovered token — conditionally mounted, so animate on appear */
 .alg-token-tooltip {
   position: absolute;
   bottom: calc(100% + 14px);
@@ -201,19 +201,17 @@
   border-radius: 12px;
   padding: 0.75rem;
   pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.18s, visibility 0.18s;
   z-index: 200;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  animation: tooltip-appear 0.15s ease both;
 }
 
-.alg-token-tooltip--visible {
-  opacity: 1;
-  visibility: visible;
+@keyframes tooltip-appear {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
 }
 
 /* Before → After cube pair */

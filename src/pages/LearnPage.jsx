@@ -138,9 +138,6 @@ function AlgTokens({ moves, startFaceMap, yellowUp = false }) {
     return result;
   }, [startFaceMap, moves]);
 
-  // Which step to display in the (possibly hidden) persistent tooltip
-  const active = steps?.[hoveredIdx ?? 0];
-
   return (
     <div ref={containerRef} className="alg-tokens">
       {moves.map((m, i) => (
@@ -161,21 +158,16 @@ function AlgTokens({ moves, startFaceMap, yellowUp = false }) {
         </span>
       ))}
 
-      {/* Two persistent AlgTooltipCube engines (before + after) — always mounted
-          so the engine isn't destroyed/recreated as the user moves across tokens */}
-      {steps && active && (
-        <div
-          className={`alg-token-tooltip${hoveredIdx !== null ? ' alg-token-tooltip--visible' : ''}`}
-          style={{ left: tooltipLeft }}
-        >
+      {/* Only mount the two AlgTooltipCubes while hovering to stay within
+          the browser's WebGL context limit (~8-16 per tab) */}
+      {steps && hoveredIdx !== null && (
+        <div className="alg-token-tooltip" style={{ left: tooltipLeft }}>
           <div className="alg-tooltip-steps">
-            <AlgTooltipCube faceMap={active.before} size={110} />
+            <AlgTooltipCube faceMap={steps[hoveredIdx].before} size={110} />
             <span className="alg-tooltip-arrow">→</span>
-            <AlgTooltipCube faceMap={active.after} size={110} />
+            <AlgTooltipCube faceMap={steps[hoveredIdx].after} size={110} />
           </div>
-          <p className="alg-token-tooltip-label">
-            {hoveredIdx !== null ? moves[hoveredIdx] : ''}
-          </p>
+          <p className="alg-token-tooltip-label">{moves[hoveredIdx]}</p>
         </div>
       )}
     </div>
