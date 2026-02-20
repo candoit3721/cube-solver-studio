@@ -23,7 +23,15 @@
       "WebFetch(domain:kociemba.org)",
       "WebFetch(domain:cs231n.stanford.edu)",
       "Bash(npx eslint:*)",
-      "Bash(git -C /Users/hwu/projects/claude-code-working-space/rubiks-cube diff --name-only HEAD)"
+      "Bash(git -C /Users/hwu/projects/claude-code-working-space/rubiks-cube diff --name-only HEAD)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm run test:run:*)",
+      "Bash(git stash:*)",
+      "WebFetch(domain:ruwix.com)",
+      "Bash(brew install:*)",
+      "Bash(pdftoppm:*)"
     ]
   }
 }
