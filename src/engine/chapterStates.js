@@ -82,28 +82,32 @@ export const CHAPTER_STATES = [
 
   // 7 — Right insert SETUP (yellow face up, white layer solved at bottom).
   // U = yellow face (on top). D = white face (fully solved at bottom).
-  // U[7]=R  → red sticker on yellow face at front-centre = "goes to Right/red face"
+  // U[7]=R  → red sticker on U face at UF position = edge goes to Right/red face
   // F[1]=F  → green sticker on front face = matches front centre
-  // FL, BL, BR slots solved; FR slot empty (F[5]=D, R[3]=D show wrong/yellow piece).
+  // FL, BL, BR middle edges solved; FR slot has displaced yellow-green edge (F[5]=F, R[3]=D).
+  // Yellow-layer corners scrambled for a realistic mid-solve appearance.
+  // Color counts: U×9 D×9 F×9 B×9 R×9 L×9
   {
-    U: ['D','D','D',  'D','D','D',  'D','R','D'],
+    U: ['B','D','D',  'R','D','L',  'D','R','F'],
     D: ['U','U','U',  'U','U','U',  'U','U','U'],
-    F: ['F','F','F',  'F','F','D',  'F','F','F'],
-    R: ['R','R','R',  'D','R','R',  'R','R','R'],
-    L: ['L','L','L',  'L','L','L',  'L','L','L'],
-    B: ['B','B','B',  'B','B','B',  'B','B','B'],
+    F: ['F','F','R',  'F','F','F',  'F','F','F'],
+    R: ['D','D','R',  'D','R','R',  'R','R','R'],
+    L: ['D','D','L',  'L','L','L',  'L','L','L'],
+    B: ['B','B','L',  'B','B','B',  'B','B','B'],
   },
 
   // 8 — Left insert SETUP (yellow face up, white layer solved at bottom).
-  // U[7]=L  → orange sticker on yellow face at front-centre = "goes to Left/orange face"
+  // U[7]=L  → orange sticker on U face at UF position = edge goes to Left/orange face
   // F[1]=F  → green sticker on front face = matches front centre
-  // FR, BL, BR slots solved; FL slot empty (F[3]=D, L[5]=D show wrong/yellow piece).
+  // FR, BL, BR middle edges solved; FL slot has displaced yellow-green edge (F[3]=F, L[5]=D).
+  // Yellow-layer corners scrambled for a realistic mid-solve appearance.
+  // Color counts: U×9 D×9 F×9 B×9 R×9 L×9
   {
-    U: ['D','D','D',  'D','D','D',  'D','L','D'],
+    U: ['L','D','B',  'L','D','B',  'F','L','D'],
     D: ['U','U','U',  'U','U','U',  'U','U','U'],
-    F: ['F','F','F',  'D','F','F',  'F','F','F'],
-    R: ['R','R','R',  'R','R','R',  'R','R','R'],
-    L: ['L','L','L',  'L','L','D',  'L','L','L'],
-    B: ['B','B','B',  'B','B','B',  'B','B','B'],
+    F: ['L','F','F',  'F','F','F',  'F','F','F'],
+    R: ['R','D','D',  'R','R','R',  'R','R','R'],
+    L: ['B','D','D',  'L','L','D',  'L','L','L'],
+    B: ['R','R','D',  'B','B','B',  'B','B','B'],
   },
 ];

@@ -50,7 +50,7 @@ describe('validators', () => {
     // Flip the UF edge: swap facelets at indices 7 and 19
     bad[7] = 'F';
     bad[19] = 'U';
-    expect(() => validate(bad)).toThrow('Edge orientation parity');
+    expect(() => validate(bad)).toThrow('Edge parity error');
   });
 
   it('rejects twisted corner (corner parity)', () => {
