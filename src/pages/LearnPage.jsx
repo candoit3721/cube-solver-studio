@@ -165,7 +165,7 @@ export default function LearnPage() {
                     {ch.algs.map((a, ai) => (
                       <div key={ai} className="chapter-alg-panel">
                         <div className="alg-panel-direction">{a.label}</div>
-                        <ChapterCube faceMap={CHAPTER_STATES[a.stateIndex]} size={160} />
+                        <ChapterCube faceMap={CHAPTER_STATES[a.stateIndex]} size={160} cameraPosition={a.cameraPosition} />
                         <p className="alg-panel-caption">edge ready in top layer</p>
                         <AlgTokens moves={a.moves} />
                         <div className="alg-note">{a.note}</div>
