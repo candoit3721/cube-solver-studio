@@ -35,6 +35,7 @@ const CHAPTERS = [
     goal: 'First two layers (F2L) complete',
     why: 'Flip the cube so yellow is on top (white solved layer at the bottom). Solve the 4 middle-layer edges one at a time — bring each edge into the top (yellow) layer, then rotate the top layer until the edge\'s front sticker matches the front centre. The sticker on the yellow face tells you which algorithm to use: red goes right, orange goes left.',
     hold: 'Yellow face up, white layer solved at bottom.',
+    yellowUp: true,
     algs: [
       {
         label: '→ Right insert',
@@ -75,6 +76,7 @@ const CHAPTERS = [
     algNote: 'Apply 1–3 times depending on starting shape.',
     hold: 'Yellow face up.',
     startFaceMap: CHAPTER_STATES[2],
+    yellowUp: true,
   },
   {
     id: 'yellow-edge-perm',
@@ -85,6 +87,7 @@ const CHAPTERS = [
     algNote: 'Applies a 3-cycle of the top edges.',
     hold: 'Yellow face up. Find a solved edge and keep it in the back.',
     startFaceMap: CHAPTER_STATES[3],
+    yellowUp: true,
   },
   {
     id: 'yellow-corner-perm',
@@ -95,6 +98,7 @@ const CHAPTERS = [
     algNote: '3-corner cycle. Repeat as needed.',
     hold: 'Yellow face up.',
     startFaceMap: CHAPTER_STATES[4],
+    yellowUp: true,
   },
   {
     id: 'yellow-corner-orient',
@@ -105,37 +109,47 @@ const CHAPTERS = [
     algNote: "Apply 2× (yellow sticker faces right) or 4× (yellow sticker faces front) per corner. Then use U or U' — not a whole-cube rotation — to bring the next incorrect corner to the front-right-top position. Repeat until all yellow stickers face up.",
     hold: 'Yellow face up. Work corner by corner at the front-right position.',
     startFaceMap: CHAPTER_STATES[5],
+    yellowUp: true,
   },
 ];
 
-function AlgTokens({ moves, startFaceMap }) {
-  const FACE_COLORS = { U: '#f5f5f5', D: '#f4d03f', F: '#27ae60', B: '#2980b9', R: '#e74c3c', L: '#e67e22' };
+function AlgTokens({ moves, startFaceMap, yellowUp = false }) {
+  // Swap U/D colours when cube is held yellow-face-up
+  const FACE_COLORS = {
+    U: yellowUp ? '#f4d03f' : '#f5f5f5',
+    D: yellowUp ? '#f5f5f5' : '#f4d03f',
+    F: '#27ae60', B: '#2980b9', R: '#e74c3c', L: '#e67e22',
+  };
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const [tooltipLeft, setTooltipLeft] = useState(0);
   const containerRef = useRef(null);
 
-  // Precompute the cube state after each move in the sequence
-  const intermediateStates = useMemo(() => {
+  // Precompute {before, after} face maps for every move in the sequence
+  const steps = useMemo(() => {
     if (!startFaceMap) return null;
     const start = faceMapToState(startFaceMap);
-    const states = [];
+    const result = [];
     let current = start;
     for (const move of moves) {
+      const before = stateToFaceMap(current);
       current = applyMove(current, move);
-      states.push(stateToFaceMap(current));
+      result.push({ before, after: stateToFaceMap(current) });
     }
-    return states;
+    return result;
   }, [startFaceMap, moves]);
+
+  // Which step to display in the (possibly hidden) persistent tooltip
+  const active = steps?.[hoveredIdx ?? 0];
 
   return (
     <div ref={containerRef} className="alg-tokens">
       {moves.map((m, i) => (
         <span
           key={i}
-          className={`alg-token${intermediateStates ? ' alg-token--hoverable' : ''}`}
+          className={`alg-token${steps ? ' alg-token--hoverable' : ''}`}
           style={{ '--face-color': FACE_COLORS[m[0]] || '#aaa' }}
           onMouseEnter={(e) => {
-            if (!intermediateStates) return;
+            if (!steps) return;
             const rect = e.currentTarget.getBoundingClientRect();
             const containerRect = containerRef.current.getBoundingClientRect();
             setTooltipLeft(rect.left - containerRect.left + rect.width / 2);
@@ -147,18 +161,20 @@ function AlgTokens({ moves, startFaceMap }) {
         </span>
       ))}
 
-      {/* Single persistent tooltip cube — always mounted so the engine isn't recreated on each hover */}
-      {intermediateStates && (
+      {/* Two persistent AlgTooltipCube engines (before + after) — always mounted
+          so the engine isn't destroyed/recreated as the user moves across tokens */}
+      {steps && active && (
         <div
           className={`alg-token-tooltip${hoveredIdx !== null ? ' alg-token-tooltip--visible' : ''}`}
           style={{ left: tooltipLeft }}
         >
-          <AlgTooltipCube
-            faceMap={hoveredIdx !== null ? intermediateStates[hoveredIdx] : intermediateStates[0]}
-            size={140}
-          />
+          <div className="alg-tooltip-steps">
+            <AlgTooltipCube faceMap={active.before} size={110} />
+            <span className="alg-tooltip-arrow">→</span>
+            <AlgTooltipCube faceMap={active.after} size={110} />
+          </div>
           <p className="alg-token-tooltip-label">
-            {hoveredIdx !== null ? moves.slice(0, hoveredIdx + 1).join(' ') : ''}
+            {hoveredIdx !== null ? moves[hoveredIdx] : ''}
           </p>
         </div>
       )}
@@ -215,7 +231,7 @@ export default function LearnPage() {
                         <div className="alg-panel-direction">{a.label}</div>
                         <ChapterCube faceMap={CHAPTER_STATES[a.stateIndex]} size={160} cameraPosition={a.cameraPosition} />
                         <p className="alg-panel-caption">edge ready in top layer</p>
-                        <AlgTokens moves={a.moves} startFaceMap={a.startFaceMap} />
+                        <AlgTokens moves={a.moves} startFaceMap={a.startFaceMap} yellowUp={ch.yellowUp} />
                         <div className="alg-note">{a.note}</div>
                       </div>
                     ))}
@@ -223,7 +239,7 @@ export default function LearnPage() {
                 ) : ch.alg ? (
                   <div className="chapter-alg">
                     <div className="alg-label">Algorithm</div>
-                    <AlgTokens moves={ch.alg} startFaceMap={ch.startFaceMap} />
+                    <AlgTokens moves={ch.alg} startFaceMap={ch.startFaceMap} yellowUp={ch.yellowUp} />
                     <div className="alg-note">{ch.algNote}</div>
                   </div>
                 ) : (
