@@ -91,9 +91,9 @@ const CHAPTERS = [
     id: 'yellow-corner-orient',
     name: 'Yellow Corner Orientation',
     goal: 'Cube fully solved',
-    why: "The final step! Twist each corner in-place using the trigger until its yellow sticker faces up. Don't panic if the cube looks scrambled mid-algorithm — it resolves.",
-    alg: ['R', 'U', "R'", "U'"],
-    algNote: 'Repeat per corner, then U to rotate the top layer.',
+    why: "The final step! Move each incorrect corner to the front-right-top position. Apply the trigger 2× if yellow faces right, or 4× if yellow faces front. The bottom layers will look scrambled while you work — that's normal, everything resolves when all corners are done.",
+    alg: ["R'", "D'", 'R', 'D'],
+    algNote: "Apply 2× (yellow sticker faces right) or 4× (yellow sticker faces front) per corner. Then use U or U' — not a whole-cube rotation — to bring the next incorrect corner to the front-right-top position. Repeat until all yellow stickers face up.",
     hold: 'Yellow face up. Work corner by corner at the front-right position.',
   },
 ];
