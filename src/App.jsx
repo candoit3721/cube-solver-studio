@@ -12,6 +12,7 @@ import CameraModal from './components/CameraModal.jsx';
 import FreeScanModal from './components/FreeScanModal.jsx';
 import CalibrationModal from './components/CalibrationModal.jsx';
 import NotationModal from './components/NotationModal.jsx';
+import TutorialOverlay from './components/TutorialOverlay.jsx';
 import { isCalibrated } from './scanner/colorCalibration.js';
 import { checkHealth } from './api/cubeApi.js';
 import './App.css';
@@ -41,7 +42,8 @@ export function AppInner() {
   const [notationOpen, setNotationOpen] = useState(false);
   const [calibrationOpen, setCalibrationOpen] = useState(false);
   const [pendingScanMode, setPendingScanMode] = useState(null); // 'scan' | 'freeScan' | null
-  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const backendOnline = useBackendHealth();
 
   const openWithCalibrationGate = useCallback((mode) => {
@@ -108,9 +110,9 @@ export function AppInner() {
         onOpenEditor={() => setEditorOpen(true)}
         onOpenCamera={() => openWithCalibrationGate('scan')}
         onOpenFreeScan={() => openWithCalibrationGate('freeScan')}
-        onOpenNotation={() => setNotationOpen(true)}
+        onOpenTutorial={() => setTutorialOpen(true)}
       />
-      <SidePanel open={panelOpen} onToggle={() => setPanelOpen(p => !p)} />
+      <SidePanel open={panelOpen} onToggle={() => setPanelOpen(p => !p)} onOpenNotation={() => setNotationOpen(true)} />
       <EditorModal open={editorOpen} onClose={() => setEditorOpen(false)} />
       <CalibrationModal
         isOpen={calibrationOpen}
@@ -120,6 +122,7 @@ export function AppInner() {
       <CameraModal open={cameraOpen} onClose={() => setCameraOpen(false)} />
       <FreeScanModal open={freeScanOpen} onClose={() => setFreeScanOpen(false)} />
       <NotationModal open={notationOpen} onClose={() => setNotationOpen(false)} />
+      {tutorialOpen && <TutorialOverlay onClose={() => setTutorialOpen(false)} />}
     </>
   );
 }

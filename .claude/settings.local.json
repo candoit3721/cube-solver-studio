@@ -31,7 +31,12 @@
       "Bash(git stash:*)",
       "WebFetch(domain:ruwix.com)",
       "Bash(brew install:*)",
-      "Bash(pdftoppm:*)"
+      "Bash(pdftoppm:*)",
+      "Bash(find:*)",
+      "Bash(npm ls:*)",
+      "Bash(grep:*)",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_press_key"
     ]
   }
 }

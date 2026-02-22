@@ -36,15 +36,31 @@ const bodyMat = new THREE.MeshStandardMaterial({
 
 const stickerGeo = new THREE.ShapeGeometry(rrShape(0.82, 0.82, 0.1));
 
+// Stickers use MeshBasicMaterial so colours are unaffected by scene lighting.
+// This guarantees every sticker renders at its exact defined colour regardless
+// of which face is angled toward or away from the light sources.
 const stickerMats = {};
 function getStickerMat(face) {
     if (!stickerMats[face]) {
-        stickerMats[face] = new THREE.MeshStandardMaterial({
-            color: FACE_THREE[face], roughness: 0.28, metalness: 0.02,
+        stickerMats[face] = new THREE.MeshBasicMaterial({
+            color: FACE_THREE[face],
         });
     }
     return stickerMats[face];
 }
+
+const dimmedMats = {};
+function getDimmedMat(colorKey) {
+    if (!dimmedMats[colorKey]) {
+        const c = FACE_THREE[colorKey].clone();
+        c.multiplyScalar(0.18); // darken to ~18% brightness so non-moving stickers fade out
+        dimmedMats[colorKey] = new THREE.MeshBasicMaterial({ color: c });
+    }
+    return dimmedMats[colorKey];
+}
+
+// Face offset needed to compute global facelet indices for dimming
+const FACE_OFFSET_CUBIE = { U: 0, R: 9, F: 18, D: 27, L: 36, B: 45 };
 
 /* ── Sticker positioning for each face ── */
 const STICKER_SPEC = [
@@ -67,7 +83,7 @@ function getFaceIdx(face, x, y, z) {
     return 0;
 }
 
-function buildCubie(x, y, z, faceMap) {
+function buildCubie(x, y, z, faceMap, dimmedFacelets = null) {
     const g = new THREE.Group();
     g.add(new THREE.Mesh(bodyGeo, bodyMat));
 
@@ -78,7 +94,14 @@ function buildCubie(x, y, z, faceMap) {
                 const idx = getFaceIdx(face, x, y, z);
                 color = faceMap[face][idx];
             }
-            const m = new THREE.Mesh(stickerGeo, getStickerMat(color));
+            let mat;
+            if (dimmedFacelets) {
+                const fIdx = FACE_OFFSET_CUBIE[face] + getFaceIdx(face, x, y, z);
+                mat = dimmedFacelets.has(fIdx) ? getDimmedMat(color) : getStickerMat(color);
+            } else {
+                mat = getStickerMat(color);
+            }
+            const m = new THREE.Mesh(stickerGeo, mat);
             m.position.set(pos[0], pos[1], pos[2]);
             m.rotation.set(rot[0], rot[1], rot[2]);
             g.add(m);
@@ -101,7 +124,7 @@ export function createEngine(container) {
     const camera = new THREE.PerspectiveCamera(
         40, container.clientWidth / container.clientHeight, 0.1, 100
     );
-    camera.position.set(5.5, 4.2, 5.5);
+    camera.position.set(10, 7.8, 10);
 
     const renderer = new THREE.WebGLRenderer({
         antialias: true, powerPreference: 'high-performance',
@@ -113,10 +136,11 @@ export function createEngine(container) {
     container.appendChild(renderer.domElement);
 
     const orbit = new OrbitControls(camera, renderer.domElement);
+    orbit.target.set(0, -1.2, 0);
     orbit.enableDamping = true;
     orbit.dampingFactor = 0.08;
     orbit.enablePan = false;
-    orbit.minDistance = 4.5;
+    orbit.minDistance = 7;
     orbit.maxDistance = 14;
     orbit.autoRotate = true;
     orbit.autoRotateSpeed = 1.2;
@@ -138,15 +162,18 @@ export function createEngine(container) {
     // Cubies array
     const cubies = [];
 
-    /** Rebuild the cube (optionally with a faceMap for custom colors) */
-    function createCube(faceMap = null) {
+    /** Rebuild the cube (optionally with a faceMap for custom colors)
+     *  options.dimmedFacelets — Set<number> of facelet indices (0–53) to render dimmed
+     */
+    function createCube(faceMap = null, options = {}) {
+        const { dimmedFacelets = null } = options;
         for (const c of cubies) scene.remove(c);
         cubies.length = 0;
         for (let x = -1; x <= 1; x++) {
             for (let y = -1; y <= 1; y++) {
                 for (let z = -1; z <= 1; z++) {
                     if (x === 0 && y === 0 && z === 0) continue;
-                    const c = buildCubie(x, y, z, faceMap);
+                    const c = buildCubie(x, y, z, faceMap, dimmedFacelets);
                     scene.add(c);
                     cubies.push(c);
                 }
@@ -169,6 +196,7 @@ export function createEngine(container) {
 
     /** Cleanup */
     function dispose() {
+        renderer.forceContextLoss(); // immediately returns the WebGL context to the browser pool
         renderer.dispose();
         orbit.dispose();
         if (renderer.domElement.parentNode) {

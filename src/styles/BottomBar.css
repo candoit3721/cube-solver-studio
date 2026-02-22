@@ -1,130 +1,310 @@
+/* ── Shared variables ── */
+:root {
+    --btn-w: 110px;
+    --btn-gap: 5px;
+    --box-pad: 8px;
+    --controls-w: 440px;
+}
+
+/* ── Tour ? button — inline in action row ── */
+.tour-btn {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+    font-weight: 700;
+    font-family: serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+}
+
+.tour-btn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    transform: none;
+}
+
+.tour-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 32, 0.95);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font);
+    white-space: nowrap;
+    color: var(--text-muted);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.tour-btn:hover .tour-tooltip {
+    opacity: 1;
+}
+
 /* ── BottomBar ── */
 .bottom-bar {
     position: fixed;
-    bottom: 0;
+    bottom: calc(24px + var(--page-footer-h, 0px));
     left: 0;
     right: 0;
     z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 20px 18px;
+    padding: 0 20px;
     pointer-events: none;
 }
 
-.bottom-bar>* {
+.bottom-bar > * {
     pointer-events: auto;
 }
 
-.hint-overlay {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 8px;
-    transition: opacity 0.4s ease;
+/* ── Controls stack — fixed width, all rows aligned ── */
+.controls-stack {
+    width: var(--controls-w);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
 }
 
-.hint-overlay strong {
-    color: var(--text);
+/* ── Row 1: workflow boxes ── */
+.workflow-row {
+    display: flex;
+    gap: var(--btn-gap);
+    align-items: stretch;
 }
 
-/* ── Combined controls row: method toggle + speed ── */
-.controls-row {
+/* Set Pattern: 60% */
+.wf-box-set {
+    flex: 3;
+    min-width: 0;
+}
+
+/* Approach: 40% */
+.wf-box-approach {
+    flex: 2;
+    min-width: 0;
+}
+
+/* ── Box card shared ── */
+.wf-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.wf-box-body {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: var(--box-pad);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: stretch;
+}
+
+/* ── Pattern grid: 2-column equal buttons ── */
+.pattern-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--btn-gap);
+    width: 100%;
+}
+
+/* ── Shared wf-btn ── */
+.wf-btn {
+    width: 100%;
+    height: 100%;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 6px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.wf-btn svg {
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+}
+
+/* ── Approach box inner layout ── */
+.approach-body {
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.approach-inner {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
-    margin-bottom: 10px;
+    width: 100%;
 }
 
-.controls-row .method-toggle {
-    display: flex;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 2px;
-    backdrop-filter: blur(12px);
-    margin-bottom: 0;
-}
-
-.method-btn {
-    font-family: var(--font);
-    font-size: 12px;
-    padding: 4px 14px;
-    border-radius: 18px;
-    border: none;
-    background: transparent;
+.approach-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
     color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    opacity: 0.7;
+    text-align: center;
 }
 
-.method-btn.active {
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-}
-
-.method-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.controls-row .speed-control {
+/* ── Toggle switch ── */
+.method-toggle {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: var(--surface);
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 10px;
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.method-toggle:has(input:disabled) {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.method-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-track {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.22s ease;
+}
+
+.method-toggle.active .toggle-track {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: transform 0.22s ease, background 0.22s ease;
+}
+
+.method-toggle.active .toggle-thumb {
+    transform: translateX(16px);
+    background: #fff;
+}
+
+.toggle-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.toggle-name {
     font-size: 12px;
-    color: var(--text-muted);
-    backdrop-filter: blur(12px);
-    margin-bottom: 0;
-}
-
-.controls-row .speed-control input[type="range"] {
-    width: 60px;
-    accent-color: var(--accent);
-}
-
-.speed-val {
-    min-width: 14px;
-    text-align: center;
     font-weight: 600;
-    color: var(--text);
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+    white-space: nowrap;
 }
 
-/* ── Playback controls ── */
+.method-toggle.active .toggle-name {
+    color: #90caf9;
+}
+
+.toggle-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    opacity: 0.55;
+    white-space: nowrap;
+}
+
+/* ── Playback row ── */
+.playback-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 9px 16px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: opacity 0.25s ease;
+    box-sizing: border-box;
+}
+
+.playback-inactive {
+    opacity: 0.28;
+    pointer-events: none;
+}
+
 .playback-controls {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 10px;
 }
 
 .pb-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
-    font-size: 12px;
+    font-size: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    backdrop-filter: blur(12px);
+    flex-shrink: 0;
 }
 
 .pb-btn:hover:not(:disabled) {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
     background: var(--surface-hover);
 }
 
 .pb-btn:disabled {
-    opacity: 0.35;
+    opacity: 0.28;
     cursor: default;
 }
 
@@ -134,19 +314,79 @@
     background: var(--accent);
     border-color: var(--accent);
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .pb-play:hover:not(:disabled) {
-    background: var(--accent);
     filter: brightness(1.15);
-    border-color: var(--accent);
 }
 
-/* ── Action buttons ── */
-.action-buttons {
+.speed-control {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-left: 1px solid var(--border);
+    padding-left: 14px;
+}
+
+.speed-control input[type="range"] {
+    width: 80px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.speed-val {
+    min-width: 14px;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text);
+}
+
+/* ── Action row: Solve + Reset + Tour ── */
+.action-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 44px;
+    gap: var(--btn-gap);
+    box-sizing: border-box;
+}
+
+.action-btn {
+    width: 100%;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 9px 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.action-btn svg {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.btn-solve-green {
+    background: var(--green) !important;
+    border-color: var(--green) !important;
+    color: #fff !important;
+}
+
+.btn-solve-green:hover:not(:disabled) {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+.btn-reset {
+    color: var(--text-muted);
+}
+
+.btn-reset:hover:not(:disabled) {
+    color: var(--text);
 }

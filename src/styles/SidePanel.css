@@ -1,17 +1,21 @@
 /* ── SidePanel ── */
 .panel-toggle {
     position: fixed;
-    top: 48px;
+    top: calc(56px + 10px);
     right: 12px;
     z-index: 11;
     border-radius: 8px;
-    font-size: 12px;
-    padding: 6px 12px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: top 0.3s ease;
 }
 
 .server-banner.show ~ .panel-toggle {
-    top: 80px;
+    top: calc(56px + 32px + 10px);
 }
 
 .panel-toggle.active {
@@ -22,15 +26,15 @@
 
 .side-panel {
     position: fixed;
-    top: 0;
+    top: 56px;
     right: -340px;
     width: 320px;
-    height: 100vh;
+    height: calc(100vh - 56px - var(--page-footer-h, 0px));
     z-index: 9;
     background: rgba(15, 15, 24, 0.92);
     border-left: 1px solid var(--border);
     backdrop-filter: blur(20px);
-    padding: 70px 16px 16px;
+    padding: 16px;
     overflow-y: auto;
     transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease, height 0.3s ease;
 }
@@ -195,4 +199,59 @@
 .sp-resources a:hover {
     opacity: 0.8;
     text-decoration: underline;
+}
+
+.sp-notation-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 14px;
+    margin-bottom: 14px;
+    background: rgba(41, 121, 255, 0.1);
+    border: 1px solid rgba(41, 121, 255, 0.35);
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font);
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.sp-notation-banner:hover {
+    background: rgba(41, 121, 255, 0.18);
+    border-color: rgba(41, 121, 255, 0.6);
+    transform: none;
+}
+
+.sp-notation-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.sp-notation-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.sp-notation-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #90caf9;
+}
+
+.sp-notation-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+.sp-notation-arrow {
+    font-size: 14px;
+    color: rgba(41, 121, 255, 0.7);
+    flex-shrink: 0;
 }

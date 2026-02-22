@@ -27,12 +27,12 @@ html, body {
   background: var(--bg);
 }
 
-/* #root is the scroll container for content pages (Learn, Algorithms, Home).
-   SolvePage uses only absolute/fixed children so it never overflows. */
+/* #root is the scroll container. Layout children use flex to fill the viewport. */
 #root {
   width: 100%; height: 100%;
   overflow-y: auto;
-  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Canvas fills entire viewport */
@@ -207,8 +207,8 @@ button:disabled {
 }
 
 .server-banner.show ~ .side-panel {
-  top: 32px;
-  height: calc(100vh - 32px);
+  top: calc(56px + 32px);
+  height: calc(100vh - 56px - 32px);
 }
 
 /* ── Animations ── */

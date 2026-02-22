@@ -42,7 +42,7 @@ const PHASE_INFO = {
     },
 };
 
-export default function SidePanel({ open, onToggle }) {
+export default function SidePanel({ open, onToggle, onOpenNotation }) {
     const { state, jumpToStep } = useCubeState();
     const { solution, step, sidePanelErr, sidePanelSolved, phases } = state;
 
@@ -121,8 +121,22 @@ export default function SidePanel({ open, onToggle }) {
 
     return (
         <>
-            <button className={`panel-toggle ${open ? 'active' : ''}`} onClick={onToggle}>
-                📋 Steps
+            <button className={`panel-toggle ${open ? 'active' : ''}`} onClick={onToggle} data-tutorial="panel-toggle" title={open ? 'Hide steps' : 'Show steps'}>
+                {open ? (
+                    /* panel open → chevron points right = collapse/hide */
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="15" y1="3" x2="15" y2="21"/>
+                        <polyline points="9 7 13 12 9 17"/>
+                    </svg>
+                ) : (
+                    /* panel closed → chevron points left = expand/show */
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="15" y1="3" x2="15" y2="21"/>
+                        <polyline points="11 7 7 12 11 17"/>
+                    </svg>
+                )}
             </button>
             <aside className={`side-panel ${open ? 'open' : ''}`}>
                 <div className="sp-header">
@@ -130,6 +144,17 @@ export default function SidePanel({ open, onToggle }) {
                 </div>
 
                 {overview && <div className="sp-overview">{overview}</div>}
+
+                {solution.length > 0 && (
+                    <button className="sp-notation-banner" onClick={onOpenNotation}>
+                        <span className="sp-notation-icon">📖</span>
+                        <span className="sp-notation-text">
+                            <span className="sp-notation-label">Move Notation Guide</span>
+                            <span className="sp-notation-sub">R, U, F, L, D, B — what each move means</span>
+                        </span>
+                        <span className="sp-notation-arrow">→</span>
+                    </button>
+                )}
 
                 <div className="sp-steps">
                     {phaseGroups.map((pg, pi) => {
@@ -162,14 +187,6 @@ export default function SidePanel({ open, onToggle }) {
                     })}
                 </div>
 
-                {solution.length > 0 && phases && phases.length > 0 && (
-                    <div className="sp-resources">
-                        <div className="sp-resources-title">Learn More</div>
-                        <a href="https://jperm.net/3x3/cfop" target="_blank" rel="noopener noreferrer">JPerm — Beginner &amp; CFOP tutorials</a>
-                        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/" target="_blank" rel="noopener noreferrer">Ruwix — Layer-by-layer guide</a>
-                        <a href="https://www.cubeskills.com/tutorials/beginners-method" target="_blank" rel="noopener noreferrer">CubeSkills — Feliks Zemdegs&apos; tutorials</a>
-                    </div>
-                )}
             </aside>
         </>
     );

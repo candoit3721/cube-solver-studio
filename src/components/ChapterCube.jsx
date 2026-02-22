@@ -84,6 +84,11 @@ export default function ChapterCube({
           resume();
         } else {
           pause();
+          // Release the WebGL context while off-screen so hovering tooltip
+          // cubes never push the total past the browser's context limit (~8-10).
+          // The engine is recreated the next time this section scrolls into view.
+          engine?.dispose();
+          engine = null;
         }
       },
       { threshold: 0.1 },

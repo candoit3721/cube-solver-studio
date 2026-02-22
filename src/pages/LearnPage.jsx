@@ -47,8 +47,10 @@ const CHAPTERS = [
         cameraPosition: [5.5, 4.2, 5.5],
         // Red arrow from the edge piece in the U layer down-right into the FR slot
         arrows: [
-          { origin: [0.3, 1.5, 1.8], dir: [1, -1, 0], length: 2.1,
-            color: 0xe74c3c, headLength: 0.55, headWidth: 0.32 },
+          {
+            origin: [0.3, 1.5, 1.8], dir: [1, -1, 0], length: 2.1,
+            color: 0xe74c3c, headLength: 0.55, headWidth: 0.32
+          },
         ],
       },
       {
@@ -61,8 +63,10 @@ const CHAPTERS = [
         cameraPosition: [-5.5, 4.2, 5.5],
         // Orange arrow from the edge piece in the U layer down-left into the FL slot
         arrows: [
-          { origin: [-0.3, 1.5, 1.8], dir: [-1, -1, 0], length: 2.1,
-            color: 0xe67e22, headLength: 0.55, headWidth: 0.32 },
+          {
+            origin: [-0.3, 1.5, 1.8], dir: [-1, -1, 0], length: 2.1,
+            color: 0xe67e22, headLength: 0.55, headWidth: 0.32
+          },
         ],
       },
     ],
@@ -113,6 +117,15 @@ const CHAPTERS = [
   },
 ];
 
+// Rotate a faceMap 180° around the x-axis (flip cube so yellow comes to top).
+// Used when a step is held yellow-face-up but the stored state is white-face-up.
+// x2 rotation: U↔D and F↔B (each pair swapped), L and R each rotated 180°.
+function rotateFaceMapX2(fm) {
+  const r = arr => [...arr].reverse();
+  // U↔D: same index mapping (no reversal). F↔B and L,R each rotate 180° (reverse).
+  return { U: [...fm.D], D: [...fm.U], F: r(fm.B), B: r(fm.F), L: r(fm.L), R: r(fm.R) };
+}
+
 function AlgTokens({ moves, startFaceMap, yellowUp = false }) {
   // Swap U/D colours when cube is held yellow-face-up
   const FACE_COLORS = {
@@ -122,12 +135,31 @@ function AlgTokens({ moves, startFaceMap, yellowUp = false }) {
   };
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const [tooltipLeft, setTooltipLeft] = useState(0);
+  const [tooltipBelow, setTooltipBelow] = useState(false);
   const containerRef = useRef(null);
 
-  // Precompute {before, after} face maps for every move in the sequence
+  // Estimated tooltip height: 1rem padding×2 + 160px cube + gaps + label ≈ 220px
+  const TOOLTIP_HEIGHT = 220;
+
+  // For moves where the primary face is hidden from the default camera, use a
+  // mirrored camera so the face is visible and the arc looks natural.
+  const CAMERA_FOR_MOVE = { 'L': [-5.5, 4.2, 5.5], "L'": [-5.5, 4.2, 5.5] };
+  const DEFAULT_CAMERA = [5.5, 4.2, 5.5];
+
+  // Precompute {before, after} face maps for every move in the sequence.
+  // When yellowUp=true but the stored faceMap has white on U (center sticker at index 4
+  // is white, not yellow), apply an x2 rotation first so tooltip cubes show yellow on top.
   const steps = useMemo(() => {
     if (!startFaceMap) return null;
-    const start = faceMapToState(startFaceMap);
+    // faceMap values are letter codes: 'U'=white, 'D'=yellow.
+    // If yellowUp and the U-face center is 'U' (white), the stored state is white-up
+    // and needs an x2 flip so tooltip cubes render with yellow on top.
+    // States already yellow-up (e.g. CHAPTER_STATES[7,8]) have U[4]==='D', so skip.
+    const effectiveFaceMap =
+      yellowUp && startFaceMap.U[4] === 'U'
+        ? rotateFaceMapX2(startFaceMap)
+        : startFaceMap;
+    const start = faceMapToState(effectiveFaceMap);
     const result = [];
     let current = start;
     for (const move of moves) {
@@ -150,6 +182,7 @@ function AlgTokens({ moves, startFaceMap, yellowUp = false }) {
             const rect = e.currentTarget.getBoundingClientRect();
             const containerRect = containerRef.current.getBoundingClientRect();
             setTooltipLeft(rect.left - containerRect.left + rect.width / 2);
+            setTooltipBelow(rect.top < TOOLTIP_HEIGHT);
             setHoveredIdx(i);
           }}
           onMouseLeave={() => setHoveredIdx(null)}
@@ -161,11 +194,11 @@ function AlgTokens({ moves, startFaceMap, yellowUp = false }) {
       {/* Only mount the two AlgTooltipCubes while hovering to stay within
           the browser's WebGL context limit (~8-16 per tab) */}
       {steps && hoveredIdx !== null && (
-        <div className="alg-token-tooltip" style={{ left: tooltipLeft }}>
+        <div className={`alg-token-tooltip${tooltipBelow ? ' alg-token-tooltip--below' : ''}`} style={{ left: tooltipLeft }}>
           <div className="alg-tooltip-steps">
-            <AlgTooltipCube faceMap={steps[hoveredIdx].before} size={110} />
+            <AlgTooltipCube key={`before-${hoveredIdx}`} faceMap={steps[hoveredIdx].before} size={160} move={moves[hoveredIdx]} cameraPosition={CAMERA_FOR_MOVE[moves[hoveredIdx]] ?? DEFAULT_CAMERA} />
             <span className="alg-tooltip-arrow">→</span>
-            <AlgTooltipCube faceMap={steps[hoveredIdx].after} size={110} />
+            <AlgTooltipCube key={`after-${hoveredIdx}`} faceMap={steps[hoveredIdx].after} size={160} cameraPosition={CAMERA_FOR_MOVE[moves[hoveredIdx]] ?? DEFAULT_CAMERA} />
           </div>
           <p className="alg-token-tooltip-label">{moves[hoveredIdx]}</p>
         </div>
@@ -204,7 +237,12 @@ export default function LearnPage() {
             <div className="chapter-body">
               {/* Left: rotatable goal-state cube (auto-rotates to show full cube) */}
               <div className="chapter-cube-col">
-                <ChapterCube faceMap={CHAPTER_STATES[i]} autoRotate={true} />
+                <ChapterCube
+                  faceMap={ch.yellowUp && CHAPTER_STATES[i]?.U?.[4] === 'U'
+                    ? rotateFaceMapX2(CHAPTER_STATES[i])
+                    : CHAPTER_STATES[i]}
+                  autoRotate={true}
+                />
                 <p className="chapter-cube-caption">Goal state</p>
               </div>
 
@@ -240,13 +278,23 @@ export default function LearnPage() {
                   </div>
                 )}
 
-                <Link to="/solve" className="chapter-practice-link">
-                  Practice in Solver →
-                </Link>
               </div>
             </div>
           </section>
         ))}
+
+        <div className="learn-solver-cta">
+          <h2 className="cta-heading">Ready to put it all together?</h2>
+          <p className="cta-sub">The interactive solver lets you go further than the guide.</p>
+          <ul className="cta-features">
+            <li><span className="cta-icon">🎨</span><span><strong>Build any pattern</strong> — mix colors freely and see what your cube looks like before you scramble it.</span></li>
+            <li><span className="cta-icon">📷</span><span><strong>Scan your real cube</strong> — enter the colors from your physical cube and get a step-by-step solution.</span></li>
+            <li><span className="cta-icon">▶</span><span><strong>Replay every move</strong> — watch the solution play out in 3D, one move at a time.</span></li>
+          </ul>
+          <Link to="/solve" className="cta-button">
+            Open the Solver →
+          </Link>
+        </div>
       </main>
     </div>
   );
