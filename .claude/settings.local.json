@@ -26,7 +26,10 @@
       "Bash(git -C /Users/hwu/projects/claude-code-working-space/rubiks-cube diff --name-only HEAD)",
       "Bash(git merge:*)",
       "Bash(git stash:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(gh repo:*)",
+      "Bash(which git:*)",
+      "Bash(git remote:*)"
     ]
   }
 }
