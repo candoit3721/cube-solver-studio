@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { to: '/solve', label: 'Solve' },
   { to: '/learn', label: 'Learn' },
   { to: '/algorithms', label: 'Algorithms' },
+  { to: '/api-explorer', label: 'API' },
 ];
 
 export default function NavHeader() {

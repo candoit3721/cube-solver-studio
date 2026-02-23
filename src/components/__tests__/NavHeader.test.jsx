@@ -7,12 +7,13 @@ function renderWithRouter(ui) {
 }
 
 describe('NavHeader', () => {
-  it('renders all four navigation links', () => {
+  it('renders all five navigation links', () => {
     renderWithRouter(<NavHeader />);
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /solve/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /learn/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /algorithms/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /api/i })).toBeInTheDocument();
   });
 
   it('renders the logo text', () => {

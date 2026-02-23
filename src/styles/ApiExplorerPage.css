@@ -1,0 +1,205 @@
+/* ── ApiExplorerPage ── */
+.aep-page {
+  padding: 40px 32px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.aep-header {
+  margin-bottom: 32px;
+}
+
+.aep-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.aep-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.aep-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .aep-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aep-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aep-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aep-method {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: #2563eb;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.aep-path {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: monospace;
+}
+
+.aep-description {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.aep-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.aep-pill {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.aep-pill:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.aep-pill-active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+/* ── Editor overlay (highlighted pre behind transparent textarea) ── */
+.aep-editor-wrap {
+  position: relative;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: border-color 0.15s;
+}
+
+.aep-editor-wrap:focus-within {
+  border-color: var(--text-muted);
+}
+
+.aep-editor-highlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--text-muted); /* punctuation colour */
+  border-radius: 6px;
+}
+
+.aep-editor {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--text);
+  border: none;
+  border-radius: 6px;
+  padding: 12px;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.aep-send {
+  align-self: flex-start;
+  padding: 7px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.aep-send:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.aep-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.aep-response {
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  overflow-x: auto;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+/* ── JSON syntax highlighting ── */
+.json-key    { color: #7dd3fc; } /* sky-300     — keys     */
+.json-string { color: #86efac; } /* green-300   — strings  */
+.json-number { color: #fda4af; } /* rose-300    — numbers  */
+.json-bool   { color: #c4b5fd; } /* violet-300  — booleans */
+.json-null   { color: #94a3b8; } /* slate-400   — null     */
+
+.aep-error {
+  font-size: 13px;
+  color: #e74c3c;
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(231, 76, 60, 0.08);
+  border: 1px solid rgba(231, 76, 60, 0.25);
+  border-radius: 6px;
+}

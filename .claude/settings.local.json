@@ -25,7 +25,8 @@
       "Bash(npx eslint:*)",
       "Bash(git -C /Users/hwu/projects/claude-code-working-space/rubiks-cube diff --name-only HEAD)",
       "Bash(git merge:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(cat:*)"
     ]
   }
 }

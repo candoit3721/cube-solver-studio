@@ -8,6 +8,12 @@ export default function PrivacyPage() {
     <main className="legal-page">
       <div className="legal-content">
         <h1>Privacy Policy</h1>
+        <p className="legal-owner">
+          Published by{' '}
+          <a href="https://www.candoitconsulting.com" target="_blank" rel="noopener noreferrer">
+            Candoit Consulting Ltd
+          </a>
+        </p>
         <p className="legal-updated">Last updated: February 2026</p>
 
         <section>
@@ -80,8 +86,12 @@ export default function PrivacyPage() {
         <section>
           <h2>8. Contact</h2>
           <p>
-            If you have any questions or concerns about this Privacy Policy, please open an issue
-            on our public repository.
+            This Privacy Policy is issued by{' '}
+            <a href="https://www.candoitconsulting.com" target="_blank" rel="noopener noreferrer">
+              Candoit Consulting Ltd
+            </a>
+            . If you have any questions or concerns, please visit our website or open an issue on
+            our public repository.
           </p>
         </section>
       </div>

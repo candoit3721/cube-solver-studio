@@ -8,6 +8,12 @@ export default function TermsPage() {
     <main className="legal-page">
       <div className="legal-content">
         <h1>Terms of Use</h1>
+        <p className="legal-owner">
+          Published by{' '}
+          <a href="https://www.candoitconsulting.com" target="_blank" rel="noopener noreferrer">
+            Candoit Consulting Ltd
+          </a>
+        </p>
         <p className="legal-updated">Last updated: February 2026</p>
 
         <section>
@@ -77,7 +83,11 @@ export default function TermsPage() {
         <section>
           <h2>8. Contact</h2>
           <p>
-            If you have any questions about these Terms of Use, please open an issue on our public
+            These Terms of Use are issued by{' '}
+            <a href="https://www.candoitconsulting.com" target="_blank" rel="noopener noreferrer">
+              Candoit Consulting Ltd
+            </a>
+            . If you have any questions, please visit our website or open an issue on our public
             repository.
           </p>
         </section>

@@ -39,8 +39,14 @@
     opacity: 0.3;
 }
 
-.pf-tech {
+.pf-copyright {
     font-size: 11px;
     color: var(--text-muted);
-    opacity: 0.35;
+    opacity: 0.45;
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+
+.pf-copyright:hover {
+    opacity: 1;
 }

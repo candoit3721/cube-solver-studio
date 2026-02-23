@@ -13,7 +13,14 @@ export default function PageFooter() {
                 <span className="pf-legal-sep">·</span>
                 <Link to="/privacy" className="pf-legal-link">Privacy Policy</Link>
             </nav>
-            <span className="pf-tech">Built with React &amp; Three.js</span>
+            <a
+                href="https://www.candoitconsulting.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pf-copyright"
+            >
+                &copy; {new Date().getFullYear()} Candoit Consulting Ltd
+            </a>
         </footer>
     );
 }

@@ -12,6 +12,23 @@
   margin-bottom: 6px;
 }
 
+.legal-owner {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.legal-owner a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.15s;
+}
+
+.legal-owner a:hover {
+  border-color: var(--text-muted);
+}
+
 .legal-updated {
   font-size: 12px;
   color: var(--text-muted);

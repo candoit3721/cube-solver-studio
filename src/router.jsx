@@ -10,6 +10,7 @@ import Home from './pages/Home.jsx';
 import SolvePage from './pages/SolvePage.jsx';
 import LearnPage from './pages/LearnPage.jsx';
 import AlgorithmsPage from './pages/AlgorithmsPage.jsx';
+import ApiExplorerPage from './pages/ApiExplorerPage.jsx';
 import TermsPage from './pages/TermsPage.jsx';
 import PrivacyPage from './pages/PrivacyPage.jsx';
 import ErrorPage from './pages/ErrorPage.jsx';
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
       { path: 'solve', element: <SolvePage /> },
       { path: 'learn', element: <LearnPage /> },
       { path: 'algorithms', element: <AlgorithmsPage /> },
+      { path: 'api-explorer', element: <ApiExplorerPage /> },
       { path: 'terms', element: <TermsPage /> },
       { path: 'privacy', element: <PrivacyPage /> },
     ],
