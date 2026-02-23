@@ -21,8 +21,6 @@ export default function TopBar() {
 
     return (
         <header className="top-bar">
-            <div className="logo">Rubik's Cube</div>
-
             <div className="top-controls">
                 {showMove && (
                     <div className="move-display show">

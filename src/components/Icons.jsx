@@ -3,7 +3,7 @@
  */
 import {
     Dices, Camera, Rotate3d, Pencil, Sparkles,
-    RotateCcw, Compass, BookOpen,
+    RotateCcw,
 } from 'lucide-react';
 
 const sz = { size: 16, strokeWidth: 2 };
@@ -14,5 +14,3 @@ export const IconScan3D    = () => <Rotate3d  {...sz} />;  // 3D Scan — rotate
 export const IconEdit      = () => <Pencil    {...sz} />;  // Edit
 export const IconSparkle   = () => <Sparkles  {...sz} />;  // Solve
 export const IconRotateCCW = () => <RotateCcw {...sz} />;  // Reset
-export const IconCompass   = () => <Compass   {...sz} />;  // Tour
-export const IconBook      = () => <BookOpen  {...sz} />;  // Notation

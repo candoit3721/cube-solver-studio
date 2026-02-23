@@ -30,7 +30,16 @@
       "Bash(gh repo:*)",
       "Bash(which git:*)",
       "Bash(git remote:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(open:*)",
+      "Bash(head:*)",
+      "Bash(lsof:*)",
+      "mcp__playwright__browser_install",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "Bash(pkill:*)",
+      "Bash(done)",
+      "Bash(find src:*)",
+      "Bash(grep ^export:*)"
     ]
   }
 }

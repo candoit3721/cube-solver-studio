@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rubik's Cube App Icon</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: rgba(255,255,255,0.06);
+    --text: #f0f0f0;
+    --muted: #666;
+    --red:    #e8312a;
+    --blue:   #1a5dc8;
+    --yellow: #f7c620;
+    --green:  #3aaa35;
+    --orange: #FF6B00;
+    --white:  #f5f5f5;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Archivo', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 60px 40px;
+  }
+
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Icon sizes showcase ── */
+  .sizes {
+    display: flex;
+    align-items: flex-end;
+    gap: 48px;
+  }
+
+  .size-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .size-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── The Icon Shell ── */
+  .icon {
+    --s: 512px;
+    width: var(--s);
+    height: var(--s);
+    border-radius: calc(var(--s) * 0.2237); /* iOS-style squircle ratio */
+    background: #1a1a28;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.08),
+      0 40px 80px rgba(0,0,0,0.7),
+      0 8px 20px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+  }
+
+  /* Background: subtle radial glow */
+  .icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 40%, rgba(255,255,255,0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 100% 100% at 20% 80%, rgba(26,93,200,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 80% at 80% 20%, rgba(232,49,42,0.10) 0%, transparent 60%);
+    z-index: 0;
+  }
+
+  /* ── 3-D Isometric Cube via CSS ── */
+  .cube-wrap {
+    position: relative;
+    z-index: 1;
+    /* scale down from 1000px design space */
+    --unit: calc(var(--s) * 0.0745);
+  }
+
+  .cube {
+    transform-style: preserve-3d;
+    transform: rotateX(32deg) rotateY(45deg);
+    width: calc(var(--unit) * 9);
+    height: calc(var(--unit) * 9);
+    position: relative;
+  }
+
+  /* Each face is a 3×3 grid of facelets */
+  .face {
+    position: absolute;
+    width: calc(var(--unit) * 9);
+    height: calc(var(--unit) * 9);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: calc(var(--unit) * 0.22);
+    padding: calc(var(--unit) * 0.22);
+    background: #0d0d0d;
+    border-radius: calc(var(--unit) * 0.35);
+    /* outer edge bevel */
+    box-shadow:
+      inset 0 calc(var(--unit) * 0.08) calc(var(--unit) * 0.2) rgba(255,255,255,0.07),
+      inset 0 calc(var(--unit) * -0.08) calc(var(--unit) * 0.2) rgba(0,0,0,0.6);
+  }
+
+  .face.top {
+    transform: rotateX(90deg) translateZ(calc(var(--unit) * 4.5));
+    background: #161616;
+  }
+  .face.bottom {
+    transform: rotateX(-90deg) translateZ(calc(var(--unit) * 4.5));
+    background: #0a0a0a;
+  }
+  .face.front {
+    transform: translateZ(calc(var(--unit) * 4.5));
+    background: #131313;
+  }
+  .face.back {
+    transform: rotateY(180deg) translateZ(calc(var(--unit) * 4.5));
+    background: #080808;
+  }
+  .face.right {
+    transform: rotateY(90deg) translateZ(calc(var(--unit) * 4.5));
+    background: #0c0c0c;
+  }
+  .face.left {
+    transform: rotateY(-90deg) translateZ(calc(var(--unit) * 4.5));
+    background: #0e0e0e;
+  }
+
+  .facelet {
+    border-radius: calc(var(--unit) * 0.18);
+    position: relative;
+    /* sticker inset: recessed into plastic + subtle specular highlight */
+    box-shadow:
+      inset 0 calc(var(--unit) * -0.12) calc(var(--unit) * 0.18) rgba(0,0,0,0.45),
+      inset 0 calc(var(--unit) * 0.06)  calc(var(--unit) * 0.1)  rgba(255,255,255,0.18);
+  }
+
+  /* Thin bright highlight on top-left of each sticker (like light catching a sticker edge) */
+  .facelet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.05) 40%,
+      transparent 60%
+    );
+    pointer-events: none;
+  }
+
+  /* Face lighting */
+  .face.top    .facelet { filter: brightness(1.12); }
+  .face.front  .facelet { filter: brightness(1.0);  }
+  .face.left   .facelet { filter: brightness(0.72); }
+  .face.right  .facelet { filter: brightness(0.68); }
+  .face.bottom .facelet { filter: brightness(0.5);  }
+  .face.back   .facelet { filter: brightness(0.4);  }
+
+  /* Bottom face colors — white face */
+  .bottom .f0 { background: var(--white); }
+  .bottom .f1 { background: var(--white); }
+  .bottom .f2 { background: var(--white); }
+  .bottom .f3 { background: var(--white); }
+  .bottom .f4 { background: var(--white); }
+  .bottom .f5 { background: var(--white); }
+  .bottom .f6 { background: var(--white); }
+  .bottom .f7 { background: var(--red); }
+  .bottom .f8 { background: var(--white); }
+
+  /* Left face colors — orange face */
+  .left .f0 { background: var(--orange); }
+  .left .f1 { background: var(--orange); }
+  .left .f2 { background: var(--orange); }
+  .left .f3 { background: var(--orange); }
+  .left .f4 { background: var(--orange); }
+  .left .f5 { background: var(--orange); }
+  .left .f6 { background: var(--green); }
+  .left .f7 { background: var(--orange); }
+  .left .f8 { background: var(--orange); }
+
+  /* Back face colors — green face */
+  .back .f0 { background: var(--green); }
+  .back .f1 { background: var(--green); }
+  .back .f2 { background: var(--green); }
+  .back .f3 { background: var(--green); }
+  .back .f4 { background: var(--green); }
+  .back .f5 { background: var(--green); }
+  .back .f6 { background: var(--green); }
+  .back .f7 { background: var(--green); }
+  .back .f8 { background: var(--green); }
+
+  /* With rotateY(45deg): visible faces are top, front (right side), left (left side) */
+
+  /* Top face: Y G Y / G Y G / Y O Y */
+  .top    .f0  { background: var(--yellow); }
+  .top    .f1  { background: var(--green);  }
+  .top    .f2  { background: var(--yellow); }
+  .top    .f3  { background: var(--green);  }
+  .top    .f4  { background: var(--yellow); }
+  .top    .f5  { background: var(--green);  }
+  .top    .f6  { background: var(--yellow); }
+  .top    .f7  { background: var(--orange); }
+  .top    .f8  { background: var(--yellow); }
+
+  /* Front face (renders RIGHT side) — red face, center=red
+     R G B
+     O R G
+     G Y R   — only 1 yellow, no adjacent same colour */
+  .front  .f0  { background: var(--red);    }
+  .front  .f1  { background: var(--green);  }
+  .front  .f2  { background: var(--blue);   }
+  .front  .f3  { background: var(--orange); }
+  .front  .f4  { background: var(--red);    }
+  .front  .f5  { background: var(--green);  }
+  .front  .f6  { background: var(--green);  }
+  .front  .f7  { background: var(--yellow); }
+  .front  .f8  { background: var(--red);    }
+
+  /* Left face (renders LEFT side) — green face, center=green
+     G R G
+     O G B
+     Y R G   — only 1 yellow, no adjacent same colour */
+  .left   .f0  { background: var(--green);  }
+  .left   .f1  { background: var(--red);    }
+  .left   .f2  { background: var(--green);  }
+  .left   .f3  { background: var(--orange); }
+  .left   .f4  { background: var(--green);  }
+  .left   .f5  { background: var(--blue);   }
+  .left   .f6  { background: var(--yellow); }
+  .left   .f7  { background: var(--red);    }
+  .left   .f8  { background: var(--green);  }
+
+  /* Bottom face — yellow center, all 6 colours, no adjacent same
+     W G W
+     R Y B
+     W O W  */
+  .bottom .f0  { background: var(--white);  }
+  .bottom .f1  { background: var(--green);  }
+  .bottom .f2  { background: var(--white);  }
+  .bottom .f3  { background: var(--red);    }
+  .bottom .f4  { background: var(--yellow); }
+  .bottom .f5  { background: var(--blue);   }
+  .bottom .f6  { background: var(--white);  }
+  .bottom .f7  { background: var(--orange); }
+  .bottom .f8  { background: var(--white);  }
+
+  /* ── Drop shadow beneath cube ── */
+  .cube-shadow {
+    position: absolute;
+    width: calc(var(--unit) * 14);
+    height: calc(var(--unit) * 5);
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    filter: blur(calc(var(--unit) * 2));
+    bottom: calc(var(--s) * 0.1);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+  }
+
+  /* ── Scale variants ── */
+  .icon.sz-1024 { --s: 1024px; }
+  .icon.sz-512  { --s: 512px; }
+  .icon.sz-256  { --s: 256px; }
+  .icon.sz-128  { --s: 128px; }
+  .icon.sz-64   { --s: 64px;  }
+  .icon.sz-32   { --s: 32px;  }
+
+  /* small size: hide gap rendering artifacts */
+  .icon.sz-64 .face, .icon.sz-32 .face { gap: 0.5px; padding: 0.5px; }
+  .icon.sz-32 .facelet { border-radius: 1px; }
+
+  /* ── Export button ── */
+  .export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text);
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .export-btn:hover {
+    border-color: rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.04);
+  }
+  .export-btn svg { opacity: 0.7; }
+
+  /* ── Full preview card ── */
+  .preview-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .preview-card-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-left: 2px;
+  }
+
+  .context-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px;
+  }
+
+  .app-name {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+  }
+  .app-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<h1>App Icon — Rubik's Cube</h1>
+
+<!-- Main Hero Icon -->
+<div class="preview-card">
+  <div class="preview-card-label">1024 × 1024</div>
+  <div class="icon sz-1024" id="hero-icon">
+    <div class="cube-shadow"></div>
+    <div class="cube-wrap">
+      <div class="cube">
+        <!-- TOP FACE -->
+        <div class="face top">
+          <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+          <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+          <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+        </div>
+        <!-- FRONT FACE -->
+        <div class="face front">
+          <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+          <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+          <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+        </div>
+        <!-- RIGHT FACE -->
+        <div class="face right">
+          <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+          <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+          <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Size variants -->
+<div class="sizes">
+  <div class="size-card">
+    <div class="icon sz-512">
+      <div class="cube-shadow"></div>
+      <div class="cube-wrap"><div class="cube">
+        <div class="face top"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face front"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face right"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+      </div></div>
+    </div>
+    <div class="size-label">512</div>
+  </div>
+
+  <div class="size-card">
+    <div class="icon sz-256">
+      <div class="cube-shadow"></div>
+      <div class="cube-wrap"><div class="cube">
+        <div class="face top"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face front"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face right"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+      </div></div>
+    </div>
+    <div class="size-label">256</div>
+  </div>
+
+  <div class="size-card">
+    <div class="icon sz-128">
+      <div class="cube-shadow"></div>
+      <div class="cube-wrap"><div class="cube">
+        <div class="face top"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face front"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face right"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+      </div></div>
+    </div>
+    <div class="size-label">128</div>
+  </div>
+
+  <div class="size-card">
+    <div class="icon sz-64">
+      <div class="cube-wrap"><div class="cube">
+        <div class="face top"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face front"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face right"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+      </div></div>
+    </div>
+    <div class="size-label">64</div>
+  </div>
+
+  <div class="size-card">
+    <div class="icon sz-32">
+      <div class="cube-wrap"><div class="cube">
+        <div class="face top"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face front"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face right"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+      </div></div>
+    </div>
+    <div class="size-label">32</div>
+  </div>
+</div>
+
+<!-- App store context -->
+<div class="preview-card">
+  <div class="preview-card-label">App Store context</div>
+  <div class="context-row">
+    <div class="icon sz-64">
+      <div class="cube-wrap"><div class="cube">
+        <div class="face top"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face front"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+        <div class="face right"><div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div><div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div><div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div></div>
+      </div></div>
+    </div>
+    <div>
+      <div class="app-name">Rubik's Cube</div>
+      <div class="app-sub">Solve · Scramble · Learn</div>
+    </div>
+  </div>
+</div>
+
+
+<template id="cube-tpl">
+  <div class="cube">
+    <div class="face top">
+      <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+      <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+      <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+    </div>
+    <div class="face bottom">
+      <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+      <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+      <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+    </div>
+    <div class="face front">
+      <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+      <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+      <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+    </div>
+    <div class="face back">
+      <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+      <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+      <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+    </div>
+    <div class="face right">
+      <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+      <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+      <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+    </div>
+    <div class="face left">
+      <div class="facelet f0"></div><div class="facelet f1"></div><div class="facelet f2"></div>
+      <div class="facelet f3"></div><div class="facelet f4"></div><div class="facelet f5"></div>
+      <div class="facelet f6"></div><div class="facelet f7"></div><div class="facelet f8"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+  const tpl = document.getElementById('cube-tpl');
+  document.querySelectorAll('.cube-wrap').forEach(wrap => {
+    while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
+    wrap.appendChild(tpl.content.cloneNode(true));
+  });
+</script>
+</body>
+</html>

@@ -19,6 +19,20 @@
   letter-spacing: 0.02em;
   white-space: nowrap;
   margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: #2a2a3e;
+  flex-shrink: 0;
 }
 
 .nav-links {

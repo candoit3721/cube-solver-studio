@@ -27,10 +27,6 @@ export function setAllCalibrations(map) {
     }
 }
 
-export function clearCalibration() {
-    refs = null;
-}
-
 export function isCalibrated() {
     if (!refs) return false;
     return FACE_IDS.every(f => refs[f]);
