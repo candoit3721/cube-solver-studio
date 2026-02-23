@@ -29,7 +29,8 @@
       "Bash(cat:*)",
       "Bash(gh repo:*)",
       "Bash(which git:*)",
-      "Bash(git remote:*)"
+      "Bash(git remote:*)",
+      "Bash(tail:*)"
     ]
   }
 }

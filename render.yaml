@@ -1,0 +1,27 @@
+services:
+  # ── Backend: Express API ──────────────────────────────────────
+  - type: web
+    name: cube-solver-studio-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+
+  # ── Frontend: Vite static site ────────────────────────────────
+  - type: web
+    name: cube-solver-studio
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false   # set manually in Render dashboard to your API service URL
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

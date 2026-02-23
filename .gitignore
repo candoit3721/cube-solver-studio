@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-.playwright-mcpis th
+.playwright-mcp
 
 # Reference docs — kept locally, not tracked in repo
 docs/reference/

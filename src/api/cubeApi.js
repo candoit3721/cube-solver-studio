@@ -1,4 +1,4 @@
-const BASE = '/api';
+const BASE = import.meta.env.VITE_API_URL ?? '/api';
 const UNAVAILABLE = 'Server unavailable — make sure the backend is running on port 3001.';
 
 export async function checkHealth() {
