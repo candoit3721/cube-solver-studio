@@ -122,6 +122,9 @@ export function CubeProvider({ children }) {
 
         set({ mode: 'solving', playing: true });
 
+        // Intentional cross-closure cancellation flag: mutating the engine object
+        // directly lets stopPlaying() cancel an in-progress async runStep loop
+        // without needing a ref or state update that would cause re-renders.
         eng._playing = true;
 
         return new Promise((resolve) => {

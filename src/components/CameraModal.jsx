@@ -10,7 +10,7 @@
  * - Auto-corrects based on cube constraints (each color appears exactly 9 times)
  */
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { FACES, FACE_HEX } from '../engine/constants.js';
+import { FACES, FACE_HEX, FACE_LETTER, NET_LAYOUT } from '../engine/constants.js';
 import { useCubeState } from '../hooks/useCubeState.jsx';
 import { validateCube } from '../api/cubeApi.js';
 import { classifyColor, sampleRegionFromData } from '../scanner/colorClassifier.js';
@@ -21,8 +21,6 @@ import '../styles/EditorModal.css';
 
 
 /* ── Singmaster notation helpers ─────────────────────────────── */
-
-const FACE_LETTER = { U: 'W', D: 'Y', F: 'G', B: 'B', R: 'R', L: 'O' };
 
 function faceGridToSingmaster(faceId, grid) {
     return `${faceId}: ${grid.map(c => FACE_LETTER[c] || '?').join('')}`;
@@ -87,12 +85,6 @@ function snapToRemainingColors(scannedFaces, faceId, cameraColors) {
 
 
 /* ── Component ───────────────────────────────────────────────── */
-
-const NET_LAYOUT = [
-    [null, 'U', null, null],
-    ['L', 'F', 'R', 'B'],
-    [null, 'D', null, null],
-];
 
 export default function CameraModal({ open, onClose }) {
     const { applyColorState } = useCubeState();

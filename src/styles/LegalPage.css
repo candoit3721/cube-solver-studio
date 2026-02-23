@@ -1,0 +1,62 @@
+/* ── LegalPage — Terms of Use & Privacy Policy ── */
+.legal-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.legal-content h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.legal-updated {
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.6;
+  margin-bottom: 40px;
+}
+
+.legal-content section {
+  margin-bottom: 32px;
+}
+
+.legal-content h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.legal-content p,
+.legal-content li {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.legal-content ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.legal-content ul li {
+  margin-bottom: 4px;
+}
+
+.legal-content code {
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--text);
+}
+
+.legal-content strong {
+  color: var(--text);
+  font-weight: 600;
+}

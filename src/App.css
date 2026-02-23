@@ -211,6 +211,19 @@ button:disabled {
   height: calc(100vh - 56px - 32px);
 }
 
+/* ── Layout ── */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.solve-page {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
 /* ── Animations ── */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp {

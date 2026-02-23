@@ -6,7 +6,7 @@ import { AppInner } from '../App.jsx';
 
 export default function SolvePage() {
   return (
-    <div style={{ position: 'relative', flex: 1, minHeight: 0, '--page-footer-h': '42px' }}>
+    <div className="solve-page" style={{ '--page-footer-h': '42px' }}>
       <CubeProvider>
         <AppInner />
       </CubeProvider>

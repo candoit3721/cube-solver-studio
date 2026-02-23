@@ -15,6 +15,30 @@
     letter-spacing: 0.1px;
 }
 
+.pf-legal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pf-legal-link {
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+
+.pf-legal-link:hover {
+    opacity: 1;
+}
+
+.pf-legal-sep {
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0.3;
+}
+
 .pf-tech {
     font-size: 11px;
     color: var(--text-muted);

@@ -1,0 +1,96 @@
+/* ErrorPage — full-viewport error layout */
+
+.error-page {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--bg, #0a0a14);
+  color: var(--text, #e8e8f0);
+  box-sizing: border-box;
+}
+
+/* Cube container */
+.error-cube {
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Error body — shifted up so the 404 code aligns near the top of the cube */
+.error-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.75rem;
+  max-width: 380px;
+  transform: translateY(-2rem);
+}
+
+@media (max-width: 700px) {
+  .error-page {
+    flex-direction: column;
+    text-align: center;
+  }
+  .error-body {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.error-code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent, #5b8fff);
+  opacity: 0.9;
+}
+
+.error-headline {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text, #e8e8f0);
+  line-height: 1.2;
+}
+
+.error-sub {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-muted, #9090b0);
+}
+
+.error-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #9090b0);
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+.error-cta {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--accent, #5b8fff);
+  background: transparent;
+  color: var(--accent, #5b8fff);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.error-cta:hover {
+  background: var(--accent, #5b8fff);
+  color: #fff;
+}

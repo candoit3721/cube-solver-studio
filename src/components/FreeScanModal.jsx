@@ -6,21 +6,17 @@
  * captures all 6 faces. On completion, transitions to review/edit flow.
  */
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { FACES, FACE_HEX } from '../engine/constants.js';
+import { FACES, FACE_HEX, FACE_LETTER, FACE_NAME, NET_LAYOUT } from '../engine/constants.js';
 import { useCubeState } from '../hooks/useCubeState.jsx';
 import { validateCube } from '../api/cubeApi.js';
 import { classifyDewarpedFace } from '../scanner/faceDetector.js';
 import { createFaceTracker } from '../scanner/faceTracker.js';
 import { initCVWorker, detectFace, terminateCVWorker } from '../scanner/cvBridge.js';
 import '../styles/FreeScanModal.css';
-import '../styles/CameraModal.css';
 import '../styles/EditorModal.css';
 
 
 /* ── Singmaster notation helpers (same as CameraModal) ── */
-
-const FACE_LETTER = { U: 'W', D: 'Y', F: 'G', B: 'B', R: 'R', L: 'O' };
-const FACE_NAME = { U: 'White', D: 'Yellow', F: 'Green', B: 'Blue', R: 'Red', L: 'Orange' };
 
 function faceGridToSingmaster(faceId, grid) {
     return `${faceId}: ${grid.map(c => FACE_LETTER[c] || '?').join('')}`;
@@ -31,15 +27,6 @@ function fullSingmaster(faces) {
         .filter(f => faces[f])
         .map(f => faceGridToSingmaster(f, faces[f]));
 }
-
-
-/* ── Layout ── */
-
-const NET_LAYOUT = [
-    [null, 'U', null, null],
-    ['L', 'F', 'R', 'B'],
-    [null, 'D', null, null],
-];
 
 
 export default function FreeScanModal({ open, onClose }) {

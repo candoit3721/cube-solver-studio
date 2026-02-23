@@ -18,7 +18,7 @@ export function initSolver() {
     }
 }
 
-export function isSolverReady() {
+function isSolverReady() {
     return solverReady;
 }
 
@@ -34,7 +34,7 @@ export function faceMapToFaceletString(faceMap) {
 /**
  * Parse solver output string → array of move strings.
  */
-export function parseSolverMoves(solStr) {
+function parseSolverMoves(solStr) {
     if (!solStr || !solStr.trim()) return [];
     return solStr.trim().split(/\s+/);
 }
@@ -42,7 +42,7 @@ export function parseSolverMoves(solStr) {
 /**
  * Verify that a move sequence solves the given faceMap.
  */
-export function verifySolution(faceMap, moves) {
+function verifySolution(faceMap, moves) {
     const state = faceMapToState(faceMap);
     const result = applyMoves(state, moves);
     return isSolved(result);

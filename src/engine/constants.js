@@ -43,6 +43,14 @@ export const MOVE_DESC = {
   'B': 'Back CW',      "B'": 'Back CCW',      'B2': 'Back 180°',
 };
 
+export const FACE_LETTER = { U: 'W', D: 'Y', F: 'G', B: 'B', R: 'R', L: 'O' };
+export const FACE_NAME = { U: 'White', D: 'Yellow', F: 'Green', B: 'Blue', R: 'Red', L: 'Orange' };
+export const NET_LAYOUT = [
+  [null, 'U', null, null],
+  ['L',  'F', 'R',  'B'],
+  [null, 'D', null, null],
+];
+
 export const FACE_OF = (m) => m.charAt(0);
 
 export const INVERT = (m) => {

@@ -143,13 +143,13 @@ export function createSolvedState() {
 }
 
 /** Parse a facelet string (54 chars, URFDLB) into state array */
-export function parseState(faceletStr) {
+function parseState(faceletStr) {
   if (faceletStr.length !== 54) throw new Error('Invalid facelet string length');
   return faceletStr.split('');
 }
 
 /** Convert state array to facelet string */
-export function stateToString(state) {
+function stateToString(state) {
   return state.join('');
 }
 
@@ -213,7 +213,7 @@ export function verifySolution(initialState, moves) {
 }
 
 /** Invert a move */
-export function invertMove(move) {
+function invertMove(move) {
   if (move.includes('2')) return move;
   if (move.includes("'")) return move[0];
   return move + "'";
@@ -255,14 +255,14 @@ export const CORNERS = [
 
 // Edge position names for reference
 export const EDGE_NAMES = ['UF', 'UR', 'UB', 'UL', 'FR', 'FL', 'BR', 'BL', 'DF', 'DR', 'DB', 'DL'];
-export const CORNER_NAMES = ['UFR', 'UFL', 'UBR', 'UBL', 'DFR', 'DFL', 'DBR', 'DBL'];
+const CORNER_NAMES = ['UFR', 'UFL', 'UBR', 'UBL', 'DFR', 'DFL', 'DBR', 'DBL'];
 
 /**
  * Find which edge position contains the edge with the given two colors.
  * Returns { pos: index, flipped: boolean }
  * flipped=false means color1 is at facelet1 of that edge position.
  */
-export function findEdge(state, color1, color2) {
+function findEdge(state, color1, color2) {
   for (let i = 0; i < EDGES.length; i++) {
     const [a, b] = EDGES[i];
     if (state[a] === color1 && state[b] === color2) return { pos: i, flipped: false };
@@ -276,7 +276,7 @@ export function findEdge(state, color1, color2) {
  * Returns { pos: index, twist: 0|1|2 }
  * twist=0 means color1 is at facelet1, twist=1 means color1 at facelet2, etc.
  */
-export function findCorner(state, color1, color2, color3) {
+function findCorner(state, color1, color2, color3) {
   const colors = new Set([color1, color2, color3]);
   for (let i = 0; i < CORNERS.length; i++) {
     const [a, b, c] = CORNERS[i];
@@ -291,7 +291,7 @@ export function findCorner(state, color1, color2, color3) {
 }
 
 /** Get the color at a specific facelet index */
-export function getColor(state, idx) {
+function getColor(state, idx) {
   return state[idx];
 }
 
