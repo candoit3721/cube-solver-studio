@@ -24,13 +24,11 @@ describe('LearnPage', () => {
     expect(h2(/yellow corner orient/i)).toBeInTheDocument();
   });
 
-  it('renders a Practice in Solver link for each chapter', () => {
+  it('renders a Solver CTA link', () => {
     render(<MemoryRouter><LearnPage /></MemoryRouter>);
-    const practiceLinks = screen.getAllByRole('link', { name: /practice.*solver/i });
-    expect(practiceLinks).toHaveLength(7);
-    practiceLinks.forEach(link => {
-      expect(link).toHaveAttribute('href', '/solve');
-    });
+    const solverLink = screen.getByRole('link', { name: /open the solver/i });
+    expect(solverLink).toBeInTheDocument();
+    expect(solverLink).toHaveAttribute('href', '/solve');
   });
 
   it('renders a ChapterCube for each chapter (7 goal-state + 2 insert-direction)', () => {
