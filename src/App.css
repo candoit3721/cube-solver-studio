@@ -64,7 +64,10 @@ html, body {
 /* Canvas fills entire viewport */
 #canvas-container {
   position: absolute;
-  inset: 0;
+  top: var(--backend-banner-h, 0px);
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 0;
   transition: top 0.3s ease;
 }
@@ -211,44 +214,6 @@ button:disabled {
 
 
 /* ── Server status banner ── */
-.server-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 200;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 0 16px;
-  max-height: 0;
-  overflow: hidden;
-  background: rgba(255, 23, 68, 0.15);
-  color: #ff8a9e;
-  border-bottom: 1px solid transparent;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s ease;
-}
-
-.server-banner.show {
-  max-height: 32px;
-  padding: 6px 16px;
-  border-bottom-color: rgba(255, 23, 68, 0.25);
-}
-
-.server-banner.show ~ #canvas-container {
-  top: 32px;
-}
-
-.server-banner.show ~ .top-bar {
-  top: 32px;
-}
-
-.server-banner.show ~ .side-panel {
-  top: calc(56px + 32px);
-  height: calc(100vh - 56px - 32px);
-}
 
 /* ── Layout ── */
 .app-layout {

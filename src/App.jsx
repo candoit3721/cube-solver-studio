@@ -1,7 +1,7 @@
 /**
  * App — main layout shell, wires all components together.
  */
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CubeProvider, useCubeState } from './hooks/useCubeState.jsx';
 import CubeCanvas from './components/CubeCanvas.jsx';
 import TopBar from './components/TopBar.jsx';
@@ -14,26 +14,7 @@ import CalibrationModal from './components/CalibrationModal.jsx';
 import NotationModal from './components/NotationModal.jsx';
 import TutorialOverlay from './components/TutorialOverlay.jsx';
 import { isCalibrated } from './scanner/colorCalibration.js';
-import { checkHealth } from './api/cubeApi.js';
 import './App.css';
-
-function useBackendHealth() {
-  const [online, setOnline] = useState(true);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const poll = async () => {
-      const ok = await checkHealth();
-      if (!cancelled) setOnline(ok);
-    };
-    poll();
-    intervalRef.current = setInterval(poll, 5000);
-    return () => { cancelled = true; clearInterval(intervalRef.current); };
-  }, []);
-
-  return online;
-}
 
 export function AppInner() {
   const [editorOpen, setEditorOpen] = useState(false);
@@ -44,8 +25,6 @@ export function AppInner() {
   const [pendingScanMode, setPendingScanMode] = useState(null); // 'scan' | 'freeScan' | null
   const [panelOpen, setPanelOpen] = useState(true);
   const [tutorialOpen, setTutorialOpen] = useState(false);
-  const backendOnline = useBackendHealth();
-
   const openWithCalibrationGate = useCallback((mode) => {
     if (isCalibrated()) {
       if (mode === 'scan') setCameraOpen(true);
@@ -101,9 +80,6 @@ export function AppInner() {
 
   return (
     <>
-      <div className={`server-banner ${backendOnline ? '' : 'show'}`}>
-        Server unavailable — start the backend to enable solving
-      </div>
       <CubeCanvas />
       <TopBar />
       <BottomBar

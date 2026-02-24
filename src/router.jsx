@@ -6,6 +6,7 @@ import './App.css';
 import NavHeader from './components/NavHeader.jsx';
 import PageFooter from './components/PageFooter.jsx';
 import OfflineBanner from './components/OfflineBanner.jsx';
+import BackendBanner from './components/BackendBanner.jsx';
 import Home from './pages/Home.jsx';
 import SolvePage from './pages/SolvePage.jsx';
 import LearnPage from './pages/LearnPage.jsx';
@@ -20,6 +21,7 @@ function Layout() {
     <div className="app-layout">
       <NavHeader />
       <OfflineBanner />
+      <BackendBanner />
       <Outlet />
       <PageFooter />
     </div>

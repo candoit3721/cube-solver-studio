@@ -1,7 +1,7 @@
 /* ── SidePanel ── */
 .panel-toggle {
     position: fixed;
-    top: calc(56px + 10px);
+    top: calc(56px + var(--backend-banner-h, 0px) + 10px);
     right: 12px;
     z-index: 11;
     border-radius: 8px;
@@ -14,10 +14,6 @@
     transition: top 0.3s ease;
 }
 
-.server-banner.show ~ .panel-toggle {
-    top: calc(56px + 32px + 10px);
-}
-
 .panel-toggle.active {
     background: var(--surface-strong);
     border-color: var(--border-hover);
@@ -26,10 +22,10 @@
 
 .side-panel {
     position: fixed;
-    top: 56px;
+    top: calc(56px + var(--backend-banner-h, 0px));
     right: -340px;
     width: 320px;
-    height: calc(100vh - 56px - var(--page-footer-h, 0px));
+    height: calc(100vh - 56px - var(--backend-banner-h, 0px) - var(--page-footer-h, 0px));
     z-index: 9;
     background: var(--surface-deep);
     border-left: 1px solid var(--border);

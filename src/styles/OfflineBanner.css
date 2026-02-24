@@ -1,18 +1,36 @@
-/* OfflineBanner — sticky flow alert bar */
+/* OfflineBanner + BackendBanner — sticky flow alert bars */
 
-.offline-banner {
+.offline-banner,
+.backend-banner {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   padding: 0.55rem 1rem;
-  background: #3a0f0f;
-  border-bottom: 1.5px solid #7a1f1f;
-  color: #f0c0c0;
   font-size: 0.875rem;
   position: sticky;
   top: 0;
   z-index: 200;
   animation: banner-slide-in 0.2s ease-out;
+}
+
+/* Browser offline — dark red */
+.offline-banner {
+  background: #3a0f0f;
+  border-bottom: 1.5px solid #7a1f1f;
+  color: #f0c0c0;
+}
+
+/* Backend unavailable — light pink / red */
+.backend-banner {
+  background: #fff0f2;
+  border-bottom: 1.5px solid #fbc8cf;
+  color: #c0152a;
+}
+
+[data-theme="dark"] .backend-banner {
+  background: rgba(220, 38, 58, 0.12);
+  border-bottom-color: rgba(220, 38, 58, 0.3);
+  color: #ff8a9e;
 }
 
 @keyframes banner-slide-in {
