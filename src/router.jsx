@@ -20,10 +20,12 @@ function Layout() {
   return (
     <div className="app-layout">
       <NavHeader />
-      <OfflineBanner />
-      <BackendBanner />
-      <Outlet />
-      <PageFooter />
+      <div className="app-content">
+        <OfflineBanner />
+        <BackendBanner />
+        <Outlet />
+        <PageFooter />
+      </div>
     </div>
   );
 }
