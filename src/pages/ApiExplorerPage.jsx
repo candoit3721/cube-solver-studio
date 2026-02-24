@@ -133,15 +133,20 @@ function EndpointPanel({ path, specPath, apiFn }) {
       <p className="aep-description">{getDescription(specPath)}</p>
 
       <div className="aep-examples">
-        {examples.map((ex) => (
-          <button
-            key={ex.key}
-            className={`aep-pill ${selectedKey === ex.key ? 'aep-pill-active' : ''}`}
-            onClick={() => selectExample(ex)}
-          >
-            {ex.label}
-          </button>
-        ))}
+        <label className="aep-example-label" htmlFor={`example-${path}`}>Example</label>
+        <select
+          id={`example-${path}`}
+          className="aep-example-select"
+          value={selectedKey}
+          onChange={(e) => {
+            const ex = examples.find(x => x.key === e.target.value);
+            if (ex) selectExample(ex);
+          }}
+        >
+          {examples.map((ex) => (
+            <option key={ex.key} value={ex.key}>{ex.label}</option>
+          ))}
+        </select>
       </div>
 
       <JsonEditor

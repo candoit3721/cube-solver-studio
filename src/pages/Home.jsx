@@ -30,9 +30,9 @@ const FEATURES = [
 ];
 
 const HOW_IT_WORKS = [
-  { step: 1, title: 'Enter your cube', desc: 'Scan with your camera or paint the stickers manually.' },
-  { step: 2, title: 'Choose a method', desc: 'Optimal (shortest path) or Beginner (layer-by-layer).' },
-  { step: 3, title: 'Follow the solution', desc: 'Step through the animated solution at your own pace.' },
+  { step: 1, title: 'Enter your cube',    desc: 'Scan with your camera or paint the stickers manually.' },
+  { step: 2, title: 'Choose a method',    desc: 'Optimal (shortest path) or Beginner (layer-by-layer).' },
+  { step: 3, title: 'Follow the solution',desc: 'Step through the animated solution at your own pace.' },
 ];
 
 export default function Home() {
@@ -53,29 +53,33 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Feature strip */}
-      <section className="features">
-        {FEATURES.map(({ title, icon, desc, link, cta }) => (
-          <article key={title} className="feature-card">
-            <div className="feature-icon">{icon}</div>
-            <h2 className="feature-title">{title}</h2>
-            <p className="feature-desc">{desc}</p>
-            <Link to={link} className="feature-link">{cta} →</Link>
-          </article>
-        ))}
+      {/* Feature strip — full-width band, inner grid constrained */}
+      <section className="features-band">
+        <div className="features">
+          {FEATURES.map(({ title, icon, desc, link, cta }) => (
+            <article key={title} className="feature-card">
+              <div className="feature-icon">{icon}</div>
+              <h2 className="feature-title">{title}</h2>
+              <p className="feature-desc">{desc}</p>
+              <Link to={link} className="feature-link">{cta} →</Link>
+            </article>
+          ))}
+        </div>
       </section>
 
-      {/* How it works */}
-      <section className="how-it-works">
-        <h2 className="hiw-heading">How it works</h2>
-        <div className="hiw-steps">
-          {HOW_IT_WORKS.map(({ step, title, desc }) => (
-            <div key={step} className="hiw-step">
-              <div className="hiw-number">{step}</div>
-              <h3 className="hiw-title">{title}</h3>
-              <p className="hiw-desc">{desc}</p>
-            </div>
-          ))}
+      {/* How it works — full-width band, inner content constrained */}
+      <section className="hiw-band">
+        <div className="how-it-works">
+          <h2 className="hiw-heading">How it works</h2>
+          <div className="hiw-steps">
+            {HOW_IT_WORKS.map(({ step, title, desc }) => (
+              <div key={step} className="hiw-step">
+                <div className="hiw-number">{step}</div>
+                <h3 className="hiw-title">{title}</h3>
+                <p className="hiw-desc">{desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

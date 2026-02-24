@@ -2,17 +2,18 @@
  * NotationModal — move notation reference.
  */
 import { MOVE_DESC } from '../engine/constants.js';
+import FaceBadge from './FaceBadge.jsx';
 
 export default function NotationModal({ open, onClose }) {
     if (!open) return null;
 
     const groups = [
-        { label: 'U — Top', moves: ['U', "U'", 'U2'] },
-        { label: 'D — Bottom', moves: ['D', "D'", 'D2'] },
-        { label: 'R — Right', moves: ['R', "R'", 'R2'] },
-        { label: 'L — Left', moves: ['L', "L'", 'L2'] },
-        { label: 'F — Front', moves: ['F', "F'", 'F2'] },
-        { label: 'B — Back', moves: ['B', "B'", 'B2'] },
+        { label: 'U — Top',    face: 'U', moves: ['U', "U'", 'U2'] },
+        { label: 'D — Bottom', face: 'D', moves: ['D', "D'", 'D2'] },
+        { label: 'R — Right',  face: 'R', moves: ['R', "R'", 'R2'] },
+        { label: 'L — Left',   face: 'L', moves: ['L', "L'", 'L2'] },
+        { label: 'F — Front',  face: 'F', moves: ['F', "F'", 'F2'] },
+        { label: 'B — Back',   face: 'B', moves: ['B', "B'", 'B2'] },
     ];
 
     return (
@@ -26,7 +27,7 @@ export default function NotationModal({ open, onClose }) {
                             <h4>{g.label}</h4>
                             {g.moves.map(m => (
                                 <div key={m} className="nota-item">
-                                    <strong>{m}</strong>
+                                    <FaceBadge face={g.face} suffix={m.slice(1)} />
                                     <span>{MOVE_DESC[m]}</span>
                                 </div>
                             ))}

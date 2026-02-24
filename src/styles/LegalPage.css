@@ -1,5 +1,8 @@
 /* ── LegalPage — Terms of Use & Privacy Policy ── */
 .legal-page {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
   max-width: 720px;
   margin: 0 auto;
   padding: 48px 24px 80px;

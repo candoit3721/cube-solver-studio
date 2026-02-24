@@ -24,24 +24,43 @@
     animation: ring-pulse 1.8s ease-in-out infinite;
 }
 
+[data-theme="light"] .tutorial-ring {
+    border-color: rgba(0, 0, 0, 0.5);
+    animation: ring-pulse-light 1.8s ease-in-out infinite;
+}
+
 @keyframes ring-pulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3), 0 0 16px rgba(255,255,255,0.15); }
     50%       { box-shadow: 0 0 0 5px rgba(255,255,255,0.1), 0 0 28px rgba(255,255,255,0.25); }
 }
 
-/* ── Tooltip card — light theme, clearly distinct from dark app ── */
+@keyframes ring-pulse-light {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0.15), 0 0 16px rgba(0,0,0,0.08); }
+    50%       { box-shadow: 0 0 0 5px rgba(0,0,0,0.06), 0 0 28px rgba(0,0,0,0.12); }
+}
+
+/* ── Tooltip card ── */
 .tutorial-tooltip {
     position: absolute;
-    background: #ffffff;
+    background: var(--surface-deep);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 0;
     box-shadow:
-        0 24px 64px rgba(0, 0, 0, 0.55),
-        0 4px 16px rgba(0, 0, 0, 0.3);
+        0 24px 64px rgba(0, 0, 0, 0.45),
+        0 4px 16px rgba(0, 0, 0, 0.25);
     cursor: default;
     z-index: 502;
     overflow: hidden;
     animation: tooltip-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="light"] .tutorial-tooltip {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.10);
+    box-shadow:
+        0 24px 64px rgba(0, 0, 0, 0.18),
+        0 4px 16px rgba(0, 0, 0, 0.10);
 }
 
 @keyframes tooltip-in {
@@ -52,13 +71,17 @@
 /* ── Progress bar at top of card ── */
 .tt-progress-bar {
     height: 3px;
-    background: #e8eaf0;
+    background: var(--surface-hover);
     width: 100%;
+}
+
+[data-theme="light"] .tt-progress-bar {
+    background: #e8eaf0;
 }
 
 .tt-progress-fill {
     height: 100%;
-    background: #4f86f7;
+    background: var(--accent);
     transition: width 0.35s ease;
 }
 
@@ -68,7 +91,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1.2px;
-    color: #6366f1;
+    color: var(--accent);
     padding: 14px 16px 0;
     margin-bottom: 3px;
 }
@@ -76,7 +99,7 @@
 .tt-title {
     font-size: 16px;
     font-weight: 800;
-    color: #0f0f1a;
+    color: var(--text);
     padding: 0 16px;
     margin-bottom: 6px;
     line-height: 1.2;
@@ -85,7 +108,7 @@
 .tt-desc {
     font-size: 12.5px;
     line-height: 1.55;
-    color: #4a4a6a;
+    color: var(--text-muted);
     padding: 0 16px;
     margin-bottom: 14px;
 }
@@ -96,8 +119,13 @@
     justify-content: space-between;
     gap: 8px;
     padding: 10px 12px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+}
+
+[data-theme="light"] .tt-footer {
     background: #f4f5fb;
-    border-top: 1px solid #e4e6f0;
+    border-top-color: #e4e6f0;
 }
 
 .tt-nav {
@@ -110,17 +138,18 @@
     font-family: inherit;
     padding: 5px 11px;
     border-radius: 20px;
-    border: 1px solid #d0d3e8;
+    border: 1px solid var(--border);
     background: transparent;
-    color: #888aaa;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s;
     font-weight: 500;
 }
 
 .tt-skip:hover {
-    color: #444466 !important;
-    background: #e8eaf6 !important;
+    background: var(--surface-hover) !important;
+    color: var(--text) !important;
+    border-color: var(--border-hover) !important;
     transform: none !important;
 }
 
@@ -130,17 +159,28 @@
     font-family: inherit;
     padding: 6px 14px;
     border-radius: 20px;
-    border: 1px solid #d0d3e8;
-    background: #fff;
-    color: #444466;
+    border: 1px solid var(--border);
+    background: var(--surface-hover);
+    color: var(--text);
     cursor: pointer;
     transition: all 0.15s;
 }
 
+[data-theme="light"] .tt-prev {
+    background: #ffffff;
+    border-color: #d0d3e8;
+    color: #444466;
+}
+
 .tt-prev:hover {
+    background: var(--surface-strong) !important;
+    color: var(--text) !important;
+    transform: none !important;
+}
+
+[data-theme="light"] .tt-prev:hover {
     background: #e8eaf6 !important;
     color: #444466 !important;
-    transform: none !important;
 }
 
 .tt-next {
@@ -150,17 +190,16 @@
     padding: 6px 18px;
     border-radius: 20px;
     border: none;
-    background: #4f86f7;
+    background: var(--accent);
     color: #fff;
     cursor: pointer;
     transition: all 0.15s;
-    box-shadow: 0 2px 8px rgba(79, 134, 247, 0.35);
+    box-shadow: 0 2px 8px var(--accent-glow);
 }
 
 .tt-next:hover {
     filter: brightness(1.1);
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.5);
-    background: #4f86f7 !important;
+    background: var(--accent) !important;
     color: #fff !important;
     transform: none !important;
 }

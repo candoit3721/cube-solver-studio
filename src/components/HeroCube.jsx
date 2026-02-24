@@ -1,11 +1,11 @@
 /**
  * HeroCube — read-only Three.js cube for the Home page hero.
- * Does not use CubeProvider — creates its own engine instance.
+ * Scene background adapts to the current theme.
  */
 import { useRef, useEffect } from 'react';
+import * as THREE from 'three';
 import { createEngine } from '../engine/cubeEngine.js';
 
-// Pre-baked scrambled face map for the hero display
 const SCRAMBLED_FACE_MAP = {
   U: ['U','R','U','F','U','B','U','L','U'],
   D: ['D','L','D','R','D','F','D','B','D'],
@@ -15,12 +15,20 @@ const SCRAMBLED_FACE_MAP = {
   L: ['L','B','L','F','L','D','L','U','L'],
 };
 
+const BG_DARK  = new THREE.Color('#0a0a14');
+const BG_LIGHT = new THREE.Color('#cdd8ee');
+
+function getThemeBg() {
+  return document.documentElement.dataset.theme === 'light' ? BG_LIGHT : BG_DARK;
+}
+
 export default function HeroCube() {
   const containerRef = useRef(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
     const engine = createEngine(containerRef.current);
+    engine.scene.background = getThemeBg();
     engine.createCube(SCRAMBLED_FACE_MAP);
 
     let animId;
@@ -33,9 +41,16 @@ export default function HeroCube() {
     const onResize = () => engine.resize();
     window.addEventListener('resize', onResize);
 
+    // Watch theme changes and update scene background
+    const observer = new MutationObserver(() => {
+      engine.scene.background = getThemeBg();
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', onResize);
+      observer.disconnect();
       engine.dispose();
     };
   }, []);

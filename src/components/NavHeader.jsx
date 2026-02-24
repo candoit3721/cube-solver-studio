@@ -3,6 +3,8 @@
  */
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import useTheme from '../hooks/useTheme';
+import { IconSun, IconMoon, IconAuto } from './Icons';
 import '../styles/NavHeader.css';
 
 const NAV_LINKS = [
@@ -15,6 +17,7 @@ const NAV_LINKS = [
 
 export default function NavHeader() {
   const [open, setOpen] = useState(false);
+  const { mode, cycleMode } = useTheme();
 
   return (
     <header className="nav-header">
@@ -71,6 +74,15 @@ export default function NavHeader() {
           </NavLink>
         ))}
       </nav>
+
+      <button
+        className="nav-theme-btn"
+        onClick={cycleMode}
+        aria-label={`Theme: ${mode}`}
+        title={mode}
+      >
+        {mode === 'light' ? <IconSun /> : mode === 'dark' ? <IconMoon /> : <IconAuto />}
+      </button>
 
       <button
         className="nav-hamburger"

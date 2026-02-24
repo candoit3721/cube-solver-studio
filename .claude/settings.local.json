@@ -39,7 +39,8 @@
       "Bash(pkill:*)",
       "Bash(done)",
       "Bash(find src:*)",
-      "Bash(grep ^export:*)"
+      "Bash(grep ^export:*)",
+      "Bash(grep:*)"
     ]
   }
 }

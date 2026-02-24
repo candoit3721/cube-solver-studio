@@ -1,8 +1,11 @@
 /* ── ApiExplorerPage ── */
 .aep-page {
+  flex: 1;
   padding: 40px 32px 80px;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .aep-header {
@@ -76,30 +79,38 @@
 
 .aep-examples {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
 }
 
-.aep-pill {
+.aep-example-label {
   font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: transparent;
+  font-weight: 600;
   color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s;
+  white-space: nowrap;
 }
 
-.aep-pill:hover {
-  border-color: var(--text-muted);
+.aep-example-select {
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text);
+  cursor: pointer;
+  flex: 1;
+  transition: border-color 0.15s;
 }
 
-.aep-pill-active {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+.aep-example-select:hover {
+  border-color: var(--border-hover);
+}
+
+.aep-example-select:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 /* ── Editor overlay (highlighted pre behind transparent textarea) ── */
@@ -164,7 +175,7 @@
 }
 
 .aep-send:hover:not(:disabled) {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .aep-send:disabled {
@@ -193,6 +204,13 @@
 .json-number { color: #fda4af; } /* rose-300    — numbers  */
 .json-bool   { color: #c4b5fd; } /* violet-300  — booleans */
 .json-null   { color: #94a3b8; } /* slate-400   — null     */
+
+/* ── Light-theme JSON syntax overrides ── */
+[data-theme="light"] .json-key    { color: #1d4ed8; }
+[data-theme="light"] .json-string { color: #16a34a; }
+[data-theme="light"] .json-number { color: #be123c; }
+[data-theme="light"] .json-bool   { color: #7c3aed; }
+[data-theme="light"] .json-null   { color: #475569; }
 
 .aep-error {
   font-size: 13px;

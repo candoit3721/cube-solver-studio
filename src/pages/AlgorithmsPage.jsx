@@ -1,13 +1,11 @@
 /**
- * AlgorithmsPage — notation guide and LBL algorithm reference.
+ * AlgorithmsPage — notation guide and algorithm method reference.
+ * Algorithm data lives in src/data/algorithms.js — add methods there.
  */
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import '../styles/AlgorithmsPage.css';
-
-const FACE_COLORS = {
-  U: '#f5f5f5', D: '#f4d03f', F: '#27ae60',
-  B: '#2980b9', R: '#e74c3c', L: '#e67e22',
-};
+import FaceBadge from '../components/FaceBadge.jsx';
+import { ALGORITHM_METHODS } from '../data/algorithms.js';
 
 const NOTATION = [
   { letter: 'U', name: 'Up',    desc: 'Top face clockwise 90°' },
@@ -19,60 +17,8 @@ const NOTATION = [
 ];
 
 const MODIFIERS = [
-  { sym: "X'",  desc: "Counter-clockwise (anti-prime)" },
-  { sym: 'X2',  desc: 'Double turn (180°)' },
-];
-
-const LBL_ALGS = [
-  {
-    phase: 'White Cross',
-    step: 1,
-    moves: null,
-    note: 'Intuitive — no fixed algorithm. Move white edges into position one by one.',
-    tip: 'Work from the top down. Rotate U to line up each edge with its center, then bring it home.',
-  },
-  {
-    phase: 'White Corners',
-    step: 2,
-    moves: ["R'", "D'", 'R', 'D'],
-    note: 'Repeat until the corner drops in with white on top.',
-    tip: "If the corner is in the top layer, first kick it out by doing the trigger once.",
-  },
-  {
-    phase: 'Middle Layer — Right Insert',
-    step: 3,
-    moves: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
-    note: 'When the edge needs to go right.',
-    tip: "Mirror: U' L' U L U F U' F' for left insert.",
-  },
-  {
-    phase: 'Yellow Cross',
-    step: 4,
-    moves: ['F', 'R', 'U', "R'", "U'", "F'"],
-    note: 'Apply 1–3 times. Start recognising dot / L-shape / line patterns.',
-    tip: 'Dot → apply 3×. L-shape → align it top-left, apply 2×. Line → align horizontal, apply 1×.',
-  },
-  {
-    phase: 'Yellow Edge Permutation',
-    step: 5,
-    moves: ['R', 'U', "R'", 'U', 'R', 'U2', "R'"],
-    note: 'Cycles three top edges counter-clockwise. Find a solved edge and put it in the back.',
-    tip: 'If no edge is solved, apply once, then re-check.',
-  },
-  {
-    phase: 'Yellow Corner Permutation',
-    step: 6,
-    moves: ['U', 'R', "U'", "L'", 'U', "R'", "U'", 'L'],
-    note: 'Cycles three corners. Find a correct corner and keep it in the front-left.',
-    tip: "Apply the algorithm from the correct corner's position, repeat as needed.",
-  },
-  {
-    phase: 'Yellow Corner Orientation',
-    step: 7,
-    moves: ['R', 'U', "R'", "U'"],
-    note: 'Twist corners in the front-right position. Then U to move to next corner.',
-    tip: 'Never rotate the top layer while doing this — only after each corner is solved.',
-  },
+  { sym: "X'", desc: 'Counter-clockwise (anti-prime)' },
+  { sym: 'X2', desc: 'Double turn (180°)' },
 ];
 
 function AlgTokens({ moves }) {
@@ -80,19 +26,40 @@ function AlgTokens({ moves }) {
   return (
     <div className="alg-tokens">
       {moves.map((m, i) => (
-        <span
-          key={i}
-          className="alg-token"
-          style={{ '--face-color': FACE_COLORS[m[0]] || '#888' }}
-        >
-          {m}
-        </span>
+        <FaceBadge key={i} face={m[0]} suffix={m.slice(1)} />
       ))}
     </div>
   );
 }
 
+function MethodSection({ method }) {
+  return (
+    <section className="alg-section" id={method.id}>
+      <h2 className="alg-section-title">{method.name}</h2>
+      <p className="alg-section-sub">{method.desc}</p>
+      <div className="lbl-grid">
+        {method.steps.map(({ step, phase, moves, note, tip }) => (
+          <article key={phase} className="lbl-card">
+            <div className="lbl-step-label">Step {step}</div>
+            <h3 className="lbl-phase-name">{phase}</h3>
+            {moves ? <AlgTokens moves={moves} /> : (
+              <div className="lbl-intuitive">Intuitive</div>
+            )}
+            <p className="lbl-note">{note}</p>
+            <div className="lbl-tip">
+              <span className="tip-label">Tip:</span> {tip}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function AlgorithmsPage() {
+  const [activeId, setActiveId] = useState(ALGORITHM_METHODS[0].id);
+  const activeMethod = ALGORITHM_METHODS.find(m => m.id === activeId);
+
   return (
     <div className="algorithms-page">
 
@@ -107,12 +74,7 @@ export default function AlgorithmsPage() {
         <div className="notation-grid">
           {NOTATION.map(({ letter, name, desc }) => (
             <div key={letter} className="notation-card">
-              <div
-                className="notation-badge"
-                style={{ background: FACE_COLORS[letter] }}
-              >
-                {letter}
-              </div>
+              <FaceBadge face={letter} />
               <div className="notation-info">
                 <div className="notation-name">{name} face</div>
                 <div className="notation-desc">{desc}</div>
@@ -132,36 +94,29 @@ export default function AlgorithmsPage() {
             ))}
           </div>
           <p className="modifier-example">
-            Examples: <code>R</code> = right face clockwise, <code>R'</code> = right face counter-clockwise, <code>R2</code> = right face 180°.
+            Examples: <code>R</code> = right face clockwise,{' '}
+            <code>R'</code> = right face counter-clockwise,{' '}
+            <code>R2</code> = right face 180°.
           </p>
         </div>
       </section>
 
-      {/* ── LBL Algorithm Reference ── */}
-      <section className="alg-section">
-        <h2 className="alg-section-title">LBL Algorithm Reference</h2>
-        <p className="alg-section-sub">
-          The complete set of algorithms for the Layer-by-Layer beginner method.
-          Hold: white on top for steps 1–3, yellow on top for steps 4–7.
-        </p>
+      {/* ── Method tabs ── */}
+      <div className="alg-tabs">
+        {ALGORITHM_METHODS.map(m => (
+          <button
+            key={m.id}
+            className={`alg-tab ${m.id === activeId ? 'alg-tab--active' : ''}`}
+            onClick={() => setActiveId(m.id)}
+          >
+            <span className="alg-tab-short">{m.shortName}</span>
+            <span className="alg-tab-full">{m.name}</span>
+          </button>
+        ))}
+      </div>
 
-        <div className="lbl-grid">
-          {LBL_ALGS.map(({ phase, step, moves, note, tip }) => (
-            <article key={phase} className="lbl-card">
-              <div className="lbl-step-label">Step {step}</div>
-              <h3 className="lbl-phase-name">{phase}</h3>
-              {moves ? <AlgTokens moves={moves} /> : (
-                <div className="lbl-intuitive">Intuitive</div>
-              )}
-              <p className="lbl-note">{note}</p>
-              <div className="lbl-tip">
-                <span className="tip-label">Tip:</span> {tip}
-              </div>
-              <Link to="/solve" className="lbl-try-link">Try it in Solver →</Link>
-            </article>
-          ))}
-        </div>
-      </section>
+      {/* ── Active method ── */}
+      {activeMethod && <MethodSection method={activeMethod} />}
 
     </div>
   );

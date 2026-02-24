@@ -8,12 +8,6 @@ export default function TermsPage() {
     <main className="legal-page">
       <div className="legal-content">
         <h1>Terms of Use</h1>
-        <p className="legal-owner">
-          Published by{' '}
-          <a href="https://www.candoitconsulting.com" target="_blank" rel="noopener noreferrer">
-            Candoit Consulting Ltd
-          </a>
-        </p>
         <p className="legal-updated">Last updated: February 2026</p>
 
         <section>

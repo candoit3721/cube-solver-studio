@@ -13,9 +13,9 @@
     height: 44px;
     flex-shrink: 0;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
     font-size: 16px;
     font-weight: 700;
     font-family: serif;
@@ -28,8 +28,8 @@
 }
 
 .tour-btn:hover {
-    border-color: rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--border-hover);
+    background: var(--surface-hover);
     color: var(--text);
     transform: none;
 }
@@ -39,7 +39,7 @@
     bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(20, 20, 32, 0.95);
+    background: var(--surface-deep);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 6px 10px;
@@ -110,7 +110,7 @@
 
 .wf-box-body {
     flex: 1;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: var(--box-pad);
@@ -201,8 +201,8 @@
     width: 36px;
     height: 20px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--surface-hover);
+    border: 1px solid var(--border-hover);
     position: relative;
     flex-shrink: 0;
     transition: all 0.22s ease;
@@ -220,7 +220,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--text-muted);
     transition: transform 0.22s ease, background 0.22s ease;
 }
 
@@ -248,6 +248,10 @@
     color: #90caf9;
 }
 
+[data-theme="light"] .method-toggle.active .toggle-name {
+    color: var(--accent);
+}
+
 .toggle-desc {
     font-size: 10px;
     color: var(--text-muted);
@@ -261,7 +265,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 9px 16px;
@@ -299,7 +303,7 @@
 }
 
 .pb-btn:hover:not(:disabled) {
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--border-hover);
     background: var(--surface-hover);
 }
 
@@ -389,4 +393,50 @@
 
 .btn-reset:hover:not(:disabled) {
     color: var(--text);
+}
+
+/* ── Light-theme: stronger contrast for all bottom bar cards/buttons ── */
+[data-theme="light"] .wf-box-body {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="light"] .playback-row {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="light"] .wf-btn {
+    background: #f4f5f8;
+    border-color: rgba(0, 0, 0, 0.10);
+    color: var(--text);
+}
+
+[data-theme="light"] .wf-btn:hover:not(:disabled) {
+    background: #eaecf1;
+    border-color: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .method-toggle {
+    background: #f4f5f8;
+    border-color: rgba(0, 0, 0, 0.10);
+}
+
+[data-theme="light"] .tour-btn,
+[data-theme="light"] .pb-btn {
+    background: #f4f5f8;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .tour-btn:hover,
+[data-theme="light"] .pb-btn:hover:not(:disabled) {
+    background: #eaecf1;
+    border-color: rgba(0, 0, 0, 0.20);
+}
+
+[data-theme="light"] .btn-reset {
+    background: #f4f5f8;
+    border-color: rgba(0, 0, 0, 0.12);
 }

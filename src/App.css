@@ -7,9 +7,15 @@
   --bg: #0a0a14;
   --surface: rgba(255, 255, 255, 0.04);
   --surface-hover: rgba(255, 255, 255, 0.08);
+  --surface-deep: #151520;
+  --surface-nav: #0a0a14;
+  --surface-strong: rgba(255, 255, 255, 0.15);
   --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
   --text: #e0e0e0;
   --text-muted: #888;
+  --text-on-surface: rgba(255, 255, 255, 0.65);
+  --text-on-surface-active: #fff;
   --accent: #2979ff;
   --accent-glow: rgba(41, 121, 255, 0.25);
   --green: #00c853;
@@ -17,6 +23,26 @@
   --red: #ff1744;
   --radius: 10px;
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg:                    #f0f2f7;
+  --surface:               rgba(0, 0, 0, 0.04);
+  --surface-hover:         rgba(0, 0, 0, 0.08);
+  --surface-deep:          #ffffff;
+  --surface-nav:           #ffffff;
+  --surface-strong:        rgba(0, 0, 0, 0.12);
+  --border:                rgba(0, 0, 0, 0.10);
+  --border-hover:          rgba(0, 0, 0, 0.18);
+  --text:                  #111827;
+  --text-muted:            #6b7280;
+  --text-on-surface:       rgba(0, 0, 0, 0.60);
+  --text-on-surface-active:#111827;
+  --accent:                #2563eb;
+  --accent-glow:           rgba(37, 99, 235, 0.20);
+  --green:                 #16a34a;
+  --orange:                #d97706;
+  --red:                   #dc2626;
 }
 
 html, body {
@@ -62,7 +88,7 @@ button, .btn {
 
 button:hover:not(:disabled) {
   background: var(--surface-hover);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--border-hover);
   transform: translateY(-1px);
 }
 
@@ -109,7 +135,7 @@ button:disabled {
 }
 
 .modal-content {
-  background: #151520;
+  background: var(--surface-deep);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 28px;
@@ -158,18 +184,31 @@ button:disabled {
   margin-bottom: 6px;
 }
 
+/* ── Shared move token (Learn / Notation / Algorithms) ── */
+.alg-token {
+  display: inline-block;
+  width: 2.4rem;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0.25rem 0;
+  border-radius: 5px;
+  background: var(--surface-hover);
+  border-left: 3px solid var(--face-color, #888);
+  font-family: monospace;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
 .nota-item {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   font-size: 13px;
-  padding: 4px 0;
+  padding: 5px 0;
   border-bottom: 1px solid var(--border);
 }
 
-.nota-item strong {
-  color: #90caf9;
-  min-width: 30px;
-}
 
 /* ── Server status banner ── */
 .server-banner {

@@ -29,6 +29,15 @@
   z-index: 1;
 }
 
+/* Light theme: slightly lighter overlay since bg is already pale blue */
+[data-theme="light"] .hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 30, 0.35) 0%,
+    rgba(10, 10, 30, 0.55) 100%
+  );
+}
+
 .hero-content {
   position: relative;
   z-index: 2;
@@ -85,7 +94,13 @@
 
 .cta-secondary:hover { background: rgba(255, 255, 255, 0.2); }
 
-/* ── Feature strip ── */
+/* ── Full-width bands ── */
+.features-band,
+.hiw-band {
+  width: 100%;
+}
+
+/* ── Feature strip — inner content ── */
 .features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -96,8 +111,8 @@
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.75rem;
   display: flex;
@@ -110,32 +125,32 @@
 .feature-title {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   margin: 0;
 }
 
 .feature-desc {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--text-muted);
   line-height: 1.6;
   flex: 1;
   margin: 0;
 }
 
 .feature-link {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-on-surface);
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 600;
   margin-top: auto;
 }
 
-.feature-link:hover { color: #fff; }
+.feature-link:hover { color: var(--text-on-surface-active); }
 
-/* ── How it works ── */
+/* ── How it works — inner content ── */
 .how-it-works {
   padding: 4rem 2rem;
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   text-align: center;
 }
@@ -144,7 +159,7 @@
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0 0 2.5rem;
-  color: #fff;
+  color: var(--text);
 }
 
 .hiw-steps {
@@ -164,26 +179,47 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 1rem;
-  color: #fff;
+  color: var(--text);
 }
 
 .hiw-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   margin: 0;
 }
 
 .hiw-desc {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
+}
+
+/* ── Light theme overrides ── */
+[data-theme="light"] .features-band {
+  background: #ffffff;
+}
+
+[data-theme="light"] .hiw-band {
+  background: #f0f2f7;
+}
+
+[data-theme="light"] .feature-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .hiw-number {
+  background: #f0f4ff;
+  border-color: rgba(37, 99, 235, 0.2);
+  color: #2563eb;
 }

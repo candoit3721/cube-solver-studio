@@ -119,7 +119,8 @@ function buildCubie(x, y, z, faceMap, dimmedFacelets = null) {
  */
 export function createEngine(container) {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#0a0a14');
+    // No scene.background — canvas is transparent so the CSS background shows through.
+    // Callers that need a specific background (e.g. HeroCube) can set engine.scene.background.
 
     const camera = new THREE.PerspectiveCamera(
         40, container.clientWidth / container.clientHeight, 0.1, 100
@@ -127,7 +128,7 @@ export function createEngine(container) {
     camera.position.set(10, 7.8, 10);
 
     const renderer = new THREE.WebGLRenderer({
-        antialias: true, powerPreference: 'high-performance',
+        antialias: true, powerPreference: 'high-performance', alpha: true,
     });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
